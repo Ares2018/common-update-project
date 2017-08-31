@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jakewharton.butterknife'
+apply from: 'http://10.100.47.176:8086/nexus/service/local/artifact/maven/redirect?r=releases&g=cn.daily.android&a=publish&e=gradle&v=0.0.4'
+
 
 
 android {
