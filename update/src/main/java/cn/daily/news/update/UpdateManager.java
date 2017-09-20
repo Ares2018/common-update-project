@@ -7,9 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 
-import com.zjrb.coreprojectlibrary.api.base.APIGetTask;
-import com.zjrb.coreprojectlibrary.api.callback.APICallBack;
-import com.zjrb.coreprojectlibrary.nav.Nav;
+import com.zjrb.core.api.base.APIGetTask;
+import com.zjrb.core.api.callback.APICallBack;
+import com.zjrb.core.nav.Nav;
 
 import java.io.File;
 
@@ -28,14 +28,11 @@ public class UpdateManager {
     }
 
     public void checkUpdate(final Context context, final String checkUrl) {
-        sendUpdateRequest(checkUrl, new OnUpdateListener() {
-            @Override
-            public void onUpdate(int versionCode, int lastVersionCode, boolean isForce, String apkUrl, String tipMsg) {
-                if (versionCode < lastVersionCode) {
-                    createForceUpdateDialog(context, lastVersionCode, isForce, apkUrl, tipMsg);
-                }
-            }
-        });
+        sendUpdateRequest(checkUrl, new DefaultOnUpdateListener(context));
+    }
+
+    public void checkUpdate(final Context context,final String checkUrl,OnUpdateListener listener){
+        sendUpdateRequest(checkUrl,listener);
     }
 
     public void createForceUpdateDialog(final Context context, int lastVersionCode, boolean isForce, final String apkUrl, String tipMsg) {
@@ -80,6 +77,14 @@ public class UpdateManager {
                     }
                 }
             }
+
+            @Override
+            public void onError(String errMsg, int errCode) {
+                super.onError(errMsg, errCode);
+                if(onUpdateListener!=null){
+                    onUpdateListener.onError(errMsg,errCode);
+                }
+            }
         }) {
             @Override
             protected void onSetupParams(Object... params) {
@@ -90,10 +95,32 @@ public class UpdateManager {
             protected String getApi() {
                 return checkUrl;
             }
-        };
+        }.exe();
     }
 
     public interface OnUpdateListener {
         void onUpdate(int versionCode, int lastVersionCode, boolean isForce, String apkUrl, String tipMsg);
+
+        void onError(String errMsg, int errCode);
+    }
+
+    private class DefaultOnUpdateListener implements OnUpdateListener {
+        private final Context mContext;
+
+        public DefaultOnUpdateListener(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void onUpdate(int versionCode, int lastVersionCode, boolean isForce, String apkUrl, String tipMsg) {
+            if (versionCode < lastVersionCode) {
+                createForceUpdateDialog(mContext, lastVersionCode, isForce, apkUrl, tipMsg);
+            }
+        }
+
+        @Override
+        public void onError(String errMsg, int errCode) {
+
+        }
     }
 }

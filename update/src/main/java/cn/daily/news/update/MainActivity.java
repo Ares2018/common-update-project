@@ -9,7 +9,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.zjrb.coreprojectlibrary.utils.UIUtils;
+import com.zjrb.core.utils.UIUtils;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE_READ_EXTERNAL_STORAGE = 101;       //申请读取图片权限

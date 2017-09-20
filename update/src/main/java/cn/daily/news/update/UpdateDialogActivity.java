@@ -9,10 +9,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.zjrb.coreprojectlibrary.utils.DownloadUtil;
-import com.zjrb.coreprojectlibrary.utils.NetUtils;
-import com.zjrb.coreprojectlibrary.utils.SettingManager;
-import com.zjrb.coreprojectlibrary.utils.UIUtils;
+import com.zjrb.core.utils.DownloadUtil;
+import com.zjrb.core.utils.NetUtils;
+import com.zjrb.core.utils.SettingManager;
+import com.zjrb.core.utils.UIUtils;
 
 import java.io.File;
 
@@ -62,8 +62,8 @@ public class UpdateDialogActivity extends AppCompatActivity implements DownloadU
                 mOkView.setText("安装");
                 mApkPath = SettingManager.getInstance().getApkPath();
             } else if (mLastVersionCode != 0) {
-                SettingManager.getInstance().saveLastApkVersionCode(mLastVersionCode);
-                SettingManager.getInstance().saveApkPath(null);
+                SettingManager.getInstance().setLastApkVersionCode(mLastVersionCode);
+                SettingManager.getInstance().setApkPath(null);
             }
         }
     }
@@ -111,7 +111,7 @@ public class UpdateDialogActivity extends AppCompatActivity implements DownloadU
 
                 @Override
                 public void onSuccess(String path) {
-                    SettingManager.getInstance().saveApkPath(path);
+                    SettingManager.getInstance().setApkPath(path);
                 }
 
                 @Override
@@ -132,7 +132,7 @@ public class UpdateDialogActivity extends AppCompatActivity implements DownloadU
     public void onSuccess(String path) {
 
         UpdateManager.getInstance().installApk(this, path);
-        SettingManager.getInstance().saveApkPath(path);
+        SettingManager.getInstance().setApkPath(path);
 
         mApkPath = path;
 

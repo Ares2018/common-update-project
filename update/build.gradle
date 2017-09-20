@@ -32,7 +32,7 @@ dependencies {
     })
 //    compile project(':core-library')
 //    compile project(':setting')
-    compile 'cn.daily.android:core-library:0.0.6.nav-SNAPSHOT'
+    compile 'cn.daily.android:core-library:1.2.4-SNAPSHOT'
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

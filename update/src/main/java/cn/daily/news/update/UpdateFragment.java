@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.zjrb.coreprojectlibrary.utils.DownloadUtil;
-import com.zjrb.coreprojectlibrary.utils.NetUtils;
+import com.zjrb.core.utils.DownloadUtil;
+import com.zjrb.core.utils.NetUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
