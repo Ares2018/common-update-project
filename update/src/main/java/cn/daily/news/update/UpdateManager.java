@@ -2,6 +2,8 @@ package cn.daily.news.update;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,11 +30,11 @@ public class UpdateManager {
     }
 
     public void checkUpdate(final Context context, final String checkUrl) {
-        sendUpdateRequest(checkUrl, new DefaultOnUpdateListener(context));
+        sendUpdateRequest(context, checkUrl, new DefaultOnUpdateListener(context));
     }
 
-    public void checkUpdate(final Context context,final String checkUrl,OnUpdateListener listener){
-        sendUpdateRequest(checkUrl,listener);
+    public void checkUpdate(final Context context, final String checkUrl, OnUpdateListener listener) {
+        sendUpdateRequest(context, checkUrl, listener);
     }
 
     public void createForceUpdateDialog(final Context context, int lastVersionCode, boolean isForce, final String apkUrl, String tipMsg) {
@@ -65,11 +67,20 @@ public class UpdateManager {
         }
     }
 
-    private void sendUpdateRequest(final String checkUrl, final OnUpdateListener onUpdateListener) {
+    private void sendUpdateRequest(final Context context, final String checkUrl, final OnUpdateListener onUpdateListener) {
         new APIGetTask<UpdateResponse.DataBean>(new APICallBack<UpdateResponse.DataBean>() {
             @Override
             public void onSuccess(UpdateResponse.DataBean data) {
+                data.current = new UpdateResponse.DataBean.CurrentBean();
+                data.current.version_code = 0;
                 if (onUpdateListener != null) {
+                    try {
+                        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                        data.current.version_code = packageInfo.versionCode;
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     if (data.current.version_code < data.latest.version_code) {
                         onUpdateListener.onUpdate(data.current.version_code, data.latest.version_code, data.latest.force_upgraded, data.latest.pkg_url, data.latest.remark);
                     } else {
@@ -81,8 +92,8 @@ public class UpdateManager {
             @Override
             public void onError(String errMsg, int errCode) {
                 super.onError(errMsg, errCode);
-                if(onUpdateListener!=null){
-                    onUpdateListener.onError(errMsg,errCode);
+                if (onUpdateListener != null) {
+                    onUpdateListener.onError(errMsg, errCode);
                 }
             }
         }) {

@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         UIUtils.init(getApplication());
+//        ThemeMode.initTheme(R.style.AppTheme,R.style.AppThemeNight);
 
         findViewById(R.id.text).setOnClickListener(new View.OnClickListener() {
             @Override
