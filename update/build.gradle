@@ -32,8 +32,9 @@ dependencies {
     })
 //    compile project(':core-library')
 //    compile project(':setting')
-    compile 'cn.daily.android:core-library:1.2.4-SNAPSHOT'
+    
 
+    compile 'cn.daily.android:core-library:5.0.0.7'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:support-v4:25.3.1'

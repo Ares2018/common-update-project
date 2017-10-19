@@ -8,10 +8,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.zjrb.core.api.base.APIGetTask;
 import com.zjrb.core.api.callback.APICallBack;
-import com.zjrb.core.nav.Nav;
+import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
 
@@ -20,37 +23,82 @@ import java.io.File;
  */
 
 public class UpdateManager {
-    private static final UpdateManager ourInstance = new UpdateManager();
 
-    public static UpdateManager getInstance() {
-        return ourInstance;
+    interface Key {
+        String UPDATE_INFO = "update_info";
     }
 
-    private UpdateManager() {
+    public interface UpdateListener {
+        void onUpdate(UpdateResponse.DataBean dataBean);
     }
 
-    public void checkUpdate(final Context context, final String checkUrl) {
-        sendUpdateRequest(context, checkUrl, new DefaultOnUpdateListener(context));
+    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
+        new APIGetTask<UpdateResponse.DataBean>(new APICallBack<UpdateResponse.DataBean>() {
+            @Override
+            public void onSuccess(UpdateResponse.DataBean data) {
+                int versionCode = 0;
+                try {
+                    PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+                    if (packageInfo != null) {
+                        versionCode = packageInfo.versionCode;
+                    }
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.e("Update", "get version code error", e);
+                }
+
+                if (versionCode < data.latest.version_code) {
+                    data.latest.isNeedUpdate = true;
+                    UpdateDialogFragment updateDialogFragment;
+
+
+                    if (data.latest.force_upgraded) {
+                        updateDialogFragment = new ForceUpdateDialog();
+                    } else {
+                        if (isHasPreloadApk(data.latest.version_code) && !TextUtils.isEmpty(SettingManager.getInstance().getApkPath())) {
+                            data.latest.preloadPath = SettingManager.getInstance().getApkPath();
+                            updateDialogFragment = new PreloadUpdateDialog();
+                        } else {
+                            updateDialogFragment = new UpdateDialogFragment();
+                        }
+                    }
+                    Bundle args = new Bundle();
+                    args.putParcelable(Key.UPDATE_INFO, data.latest);
+                    updateDialogFragment.setArguments(args);
+                    updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
+                }
+
+                if (listener != null) {
+                    listener.onUpdate(data);
+                }
+            }
+        }) {
+            @Override
+            protected void onSetupParams(Object... params) {
+            }
+
+            @Override
+            protected String getApi() {
+                return "/api/app_version/detail";
+            }
+        }.exe();
     }
 
-    public void checkUpdate(final Context context, final String checkUrl, OnUpdateListener listener) {
-        sendUpdateRequest(context, checkUrl, listener);
+    public static boolean isHasPreloadApk(int lastVersionCode) {
+        if (lastVersionCode == SettingManager.getInstance().getLastApkVersionCode()) {
+            String path = SettingManager.getInstance().getApkPath();
+            if (!TextUtils.isEmpty(path)) {
+                File file = new File(path);
+                if (file.exists()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public void createForceUpdateDialog(final Context context, int lastVersionCode, boolean isForce, final String apkUrl, String tipMsg) {
-        Bundle bundle = new Bundle();
-        bundle.putString(Update.Key.title, "更新提示");
-        bundle.putBoolean(Update.Key.isForce, isForce);
-        bundle.putString(Update.Key.message, tipMsg);
-        bundle.putInt(Update.Key.lastVersionCode, lastVersionCode);
-        bundle.putString(Update.Key.url, apkUrl);
-        Nav.with(context).setExtras(bundle).to("http://www.8531.cn/update/dialog");
-    }
+    private static String MIME_APK = "application/vnd.android.package-archive";
 
-
-    private String MIME_APK = "application/vnd.android.package-archive";
-
-    public void installApk(Context context, String path) {
+    public static void installApk(Context context, String path) {
         File file = new File(path);
         if (file.exists()) {
             Intent install = new Intent(Intent.ACTION_VIEW);
@@ -64,74 +112,6 @@ public class UpdateManager {
                 install.setDataAndType(Uri.fromFile(file), MIME_APK);
             }
             context.startActivity(install);
-        }
-    }
-
-    private void sendUpdateRequest(final Context context, final String checkUrl, final OnUpdateListener onUpdateListener) {
-        new APIGetTask<UpdateResponse.DataBean>(new APICallBack<UpdateResponse.DataBean>() {
-            @Override
-            public void onSuccess(UpdateResponse.DataBean data) {
-                data.current = new UpdateResponse.DataBean.CurrentBean();
-                data.current.version_code = 0;
-                if (onUpdateListener != null) {
-                    try {
-                        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-                        data.current.version_code = packageInfo.versionCode;
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (data.current.version_code < data.latest.version_code) {
-                        onUpdateListener.onUpdate(data.current.version_code, data.latest.version_code, data.latest.force_upgraded, data.latest.pkg_url, data.latest.remark);
-                    } else {
-                        onUpdateListener.onUpdate(data.current.version_code, data.latest.version_code, data.latest.force_upgraded, data.latest.pkg_url, data.latest.remark);
-                    }
-                }
-            }
-
-            @Override
-            public void onError(String errMsg, int errCode) {
-                super.onError(errMsg, errCode);
-                if (onUpdateListener != null) {
-                    onUpdateListener.onError(errMsg, errCode);
-                }
-            }
-        }) {
-            @Override
-            protected void onSetupParams(Object... params) {
-
-            }
-
-            @Override
-            protected String getApi() {
-                return checkUrl;
-            }
-        }.exe();
-    }
-
-    public interface OnUpdateListener {
-        void onUpdate(int versionCode, int lastVersionCode, boolean isForce, String apkUrl, String tipMsg);
-
-        void onError(String errMsg, int errCode);
-    }
-
-    private class DefaultOnUpdateListener implements OnUpdateListener {
-        private final Context mContext;
-
-        public DefaultOnUpdateListener(Context context) {
-            mContext = context;
-        }
-
-        @Override
-        public void onUpdate(int versionCode, int lastVersionCode, boolean isForce, String apkUrl, String tipMsg) {
-            if (versionCode < lastVersionCode) {
-                createForceUpdateDialog(mContext, lastVersionCode, isForce, apkUrl, tipMsg);
-            }
-        }
-
-        @Override
-        public void onError(String errMsg, int errCode) {
-
         }
     }
 }
