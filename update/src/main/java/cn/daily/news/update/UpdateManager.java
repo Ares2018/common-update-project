@@ -30,6 +30,8 @@ public class UpdateManager {
 
     public interface UpdateListener {
         void onUpdate(UpdateResponse.DataBean dataBean);
+
+        void onError(String errMsg, int errCode);
     }
 
     public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
@@ -49,8 +51,6 @@ public class UpdateManager {
                 if (versionCode < data.latest.version_code) {
                     data.latest.isNeedUpdate = true;
                     UpdateDialogFragment updateDialogFragment;
-
-
                     if (data.latest.force_upgraded) {
                         updateDialogFragment = new ForceUpdateDialog();
                     } else {
@@ -69,6 +69,14 @@ public class UpdateManager {
 
                 if (listener != null) {
                     listener.onUpdate(data);
+                }
+            }
+
+            @Override
+            public void onError(String errMsg, int errCode) {
+                super.onError(errMsg, errCode);
+                if (listener != null) {
+                    listener.onError(errMsg, errCode);
                 }
             }
         }) {

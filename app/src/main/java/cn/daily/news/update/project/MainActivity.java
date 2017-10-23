@@ -20,6 +20,7 @@ public class MainActivity extends BaseActivity {
                 new UpdateManager().checkUpdate(MainActivity.this, null);
             }
         });
+
     }
 
 

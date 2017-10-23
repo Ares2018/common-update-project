@@ -1,7 +1,12 @@
 package cn.daily.news.update;
 
 
+import android.app.DownloadManager;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -11,10 +16,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.zjrb.core.common.permission.AbsPermSingleCallBack;
+import com.zjrb.core.common.permission.IPermissionOperate;
+import com.zjrb.core.common.permission.Permission;
+import com.zjrb.core.common.permission.PermissionManager;
 import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.NetUtils;
 import com.zjrb.core.utils.SettingManager;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +37,7 @@ import butterknife.Unbinder;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener {
+public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener,IPermissionOperate {
     @BindView(R2.id.update_dialog_title)
     TextView mTitleView;
     @BindView(R2.id.update_dialog_msg)
@@ -85,16 +97,39 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             downloadApk();
         } else {
             dismiss();
-            NonWiFiUpdateDialog updateDialogFragment = new NonWiFiUpdateDialog();
+            NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
             args.putParcelable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
-            updateDialogFragment.setArguments(args);
-            updateDialogFragment.show(getFragmentManager(), "updateDialog");
+            dialog.setArguments(args);
+            dialog.show(getFragmentManager(), "updateDialog");
         }
     }
 
     protected void downloadApk() {
-        DownloadUtil.get().setListener(this).download(mLatestBean.pkg_url);
+
+        PermissionManager.get().request(this, new AbsPermSingleCallBack() {
+            @Override
+            public void onGranted(boolean isAlreadyDef) {
+                dismiss();
+                DownloadManager downloadManager= (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager.Request request=new DownloadManager.Request(Uri.parse(mLatestBean.pkg_url));
+                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+                request.setTitle("浙江新闻");
+                request.setDescription("更新浙江新闻版本到"+mLatestBean.version);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"zhejiang.apk");
+                request.setMimeType("application/vnd.android.package-archive");
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                downloadManager.enqueue(request);
+            }
+
+            @Override
+            public void onDenied(List<String> neverAskPerms) {
+                Toast.makeText(getContext(),"请给我写文件的权限",Toast.LENGTH_SHORT).show();
+            }
+        }, Permission.STORAGE_WRITE);
+
+
+
     }
 
     protected void forceDowloadApk(){
@@ -161,5 +196,23 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         super.onDestroyView();
         mUnBinder.unbind();
         DownloadUtil.get().setListener(null);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionManager.get().onRequestPermissionsResult(requestCode, permissions,
+                grantResults, this);
+    }
+
+    @Override
+    public void exeRequestPermissions(@NonNull String[] permissions, int requestCode) {
+        requestPermissions(permissions, requestCode);
+    }
+
+    @Override
+    public boolean exeShouldShowRequestPermissionRationale(@NonNull String permission) {
+        return shouldShowRequestPermissionRationale(permission);
     }
 }
