@@ -26,6 +26,8 @@ public class UpdateManager {
 
     interface Key {
         String UPDATE_INFO = "update_info";
+        String APK_NAME = "zhejiang.apk";
+        String VERSION_CODE = "version_code";
     }
 
     public interface UpdateListener {
@@ -40,6 +42,7 @@ public class UpdateManager {
             public void onSuccess(UpdateResponse.DataBean data) {
                 int versionCode = 0;
                 try {
+                    data.latest.pkg_url = Uri.parse(data.latest.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(data.latest.version_code)).build().toString();
                     PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
                     if (packageInfo != null) {
                         versionCode = packageInfo.versionCode;
@@ -54,8 +57,8 @@ public class UpdateManager {
                     if (data.latest.force_upgraded) {
                         updateDialogFragment = new ForceUpdateDialog();
                     } else {
-                        if (isHasPreloadApk(data.latest.version_code) && !TextUtils.isEmpty(SettingManager.getInstance().getApkPath())) {
-                            data.latest.preloadPath = SettingManager.getInstance().getApkPath();
+                        if (isHasPreloadApk(data.latest.pkg_url)) {
+                            data.latest.preloadPath = SettingManager.getInstance().getApkPath(data.latest.pkg_url);
                             updateDialogFragment = new PreloadUpdateDialog();
                         } else {
                             updateDialogFragment = new UpdateDialogFragment();
@@ -91,17 +94,19 @@ public class UpdateManager {
         }.exe();
     }
 
-    public static boolean isHasPreloadApk(int lastVersionCode) {
-        if (lastVersionCode == SettingManager.getInstance().getLastApkVersionCode()) {
-            String path = SettingManager.getInstance().getApkPath();
+    public static boolean isHasPreloadApk(String pkg_url) {
+        try {
+            String path = SettingManager.getInstance().getApkPath(pkg_url);
             if (!TextUtils.isEmpty(path)) {
                 File file = new File(path);
                 if (file.exists()) {
                     return true;
                 }
             }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     private static String MIME_APK = "application/vnd.android.package-archive";

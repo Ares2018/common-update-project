@@ -14,7 +14,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +21,7 @@ import com.zjrb.core.common.permission.AbsPermSingleCallBack;
 import com.zjrb.core.common.permission.IPermissionOperate;
 import com.zjrb.core.common.permission.Permission;
 import com.zjrb.core.common.permission.PermissionManager;
+import com.zjrb.core.ui.widget.dialog.LoadingIndicatorDialog;
 import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.NetUtils;
 import com.zjrb.core.utils.SettingManager;
@@ -37,7 +37,7 @@ import butterknife.Unbinder;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener,IPermissionOperate {
+public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate {
     @BindView(R2.id.update_dialog_title)
     TextView mTitleView;
     @BindView(R2.id.update_dialog_msg)
@@ -46,12 +46,10 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     View mCancelView;
     @BindView(R2.id.update_dialog_ok)
     TextView mOkView;
-    @BindView(R2.id.update_dialog_progressBar)
-    ProgressBar mProgressBar;
+    LoadingIndicatorDialog mProgressBar;
 
     private Unbinder mUnBinder;
     private UpdateResponse.DataBean.LatestBean mLatestBean;
-    private String mApkPath;
 
     @Nullable
     @Override
@@ -59,6 +57,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
         mUnBinder = ButterKnife.bind(this, rootView);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        setCancelable(false);
 
         if (getArguments() != null) {
             mLatestBean = getArguments().getParcelable(UpdateManager.Key.UPDATE_INFO);
@@ -69,7 +68,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         return rootView;
     }
 
-    protected void hideCancel(){
+    protected void hideCancel() {
         mCancelView.setVisibility(View.GONE);
     }
 
@@ -88,7 +87,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     protected String getOKText() {
         return "更新";
     }
-
 
 
     @OnClick(R2.id.update_dialog_ok)
@@ -111,37 +109,46 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 dismiss();
-                DownloadManager downloadManager= (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-                DownloadManager.Request request=new DownloadManager.Request(Uri.parse(mLatestBean.pkg_url));
+                DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mLatestBean.pkg_url));
                 request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
                 request.setTitle("浙江新闻");
-                request.setDescription("更新浙江新闻版本到"+mLatestBean.version);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"zhejiang.apk");
+                request.setDescription("更新浙江新闻版本到" + mLatestBean.version);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, UpdateManager.Key.APK_NAME);
                 request.setMimeType("application/vnd.android.package-archive");
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 downloadManager.enqueue(request);
+                SettingManager.getInstance().setLastApkVersionCode(mLatestBean.version_code);
+                SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, null);
             }
 
             @Override
             public void onDenied(List<String> neverAskPerms) {
-                Toast.makeText(getContext(),"请给我写文件的权限",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "请给我写文件的权限", Toast.LENGTH_SHORT).show();
             }
         }, Permission.STORAGE_WRITE);
 
 
-
     }
 
-    protected void forceDowloadApk(){
-        mProgressBar.setVisibility(View.VISIBLE);
-        mMsgView.setVisibility(View.GONE);
-        DownloadUtil.get().setListener(this).download(mLatestBean.pkg_url);
+    protected void forceDownloadApk() {
+        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
+            mOkView.setText("安装");
+            UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+        } else {
+            mProgressBar = new LoadingIndicatorDialog(getActivity());
+            mProgressBar.show();
+            DownloadUtil.get().setListener(this).download(mLatestBean.pkg_url);
+        }
     }
 
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
-        if (UpdateManager.isHasPreloadApk(mLatestBean.version_code) && NetUtils.isWifi()) {
-            DownloadUtil.get().setListener(new DownloadUtil.OnDownloadListener() {
+        dismiss();
+        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
+            DownloadUtil.get()
+                    .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
+                    .setFileName(UpdateManager.Key.APK_NAME).setListener(new DownloadUtil.OnDownloadListener() {
                 @Override
                 public void onLoading(int progress) {
 
@@ -149,7 +156,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                 @Override
                 public void onSuccess(String path) {
-                    SettingManager.getInstance().setApkPath(path);
+                    SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
                 }
 
                 @Override
@@ -158,7 +165,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 }
             }).download(mLatestBean.pkg_url);
         }
-        dismiss();
     }
 
     @Override
@@ -168,25 +174,20 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
     @Override
     public void onSuccess(String path) {
-
         UpdateManager.installApk(getContext(), path);
-        SettingManager.getInstance().setApkPath(path);
-
-        mApkPath = path;
-
-        mMsgView.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.GONE);
+        SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+        mProgressBar.dismiss();
         mOkView.setEnabled(true);
         mOkView.setText("安装");
     }
 
-    protected void installPreloadApk(){
-        UpdateManager.installApk(getContext(),mLatestBean.preloadPath);
+    protected void installPreloadApk() {
+        UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
     }
 
     @Override
     public void onFail(String err) {
-        mProgressBar.setVisibility(View.GONE);
+        mProgressBar.dismiss();
         mMsgView.setText("更新失败,请稍后再试");
         mMsgView.setVisibility(View.VISIBLE);
     }

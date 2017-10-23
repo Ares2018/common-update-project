@@ -22,7 +22,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment {
 
     @Override
     public void updateApk(View view) {
-        forceDowloadApk();
+        forceDownloadApk();
     }
 
     @Override
