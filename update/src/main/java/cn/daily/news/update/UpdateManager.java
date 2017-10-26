@@ -40,6 +40,15 @@ public class UpdateManager {
         new APIGetTask<UpdateResponse.DataBean>(new APICallBack<UpdateResponse.DataBean>() {
             @Override
             public void onSuccess(UpdateResponse.DataBean data) {
+                if (data == null || data.latest == null) {
+                    if (listener != null) {
+                        listener.onError("检测更新失败!", -1);
+                        if (BuildConfig.DEBUG) {
+                            Log.e("update", "服务端返回错误!");
+                        }
+                    }
+                    return;
+                }
                 int versionCode = 0;
                 try {
                     data.latest.pkg_url = Uri.parse(data.latest.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(data.latest.version_code)).build().toString();
