@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.zjrb.core.api.base.APIGetTask;
 import com.zjrb.core.api.callback.APICallBack;
+import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
@@ -23,6 +24,10 @@ import java.io.File;
  */
 
 public class UpdateManager {
+
+    public static void checkUpdate(AppCompatActivity appCompatActivity,ResourceBiz.LatestVersionBean latest_version) {
+        checkData(latest_version, appCompatActivity, null);
+    }
 
     interface Key {
         String UPDATE_INFO = "update_info";
@@ -49,39 +54,7 @@ public class UpdateManager {
                     }
                     return;
                 }
-                int versionCode = 0;
-                try {
-                    data.latest.pkg_url = Uri.parse(data.latest.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(data.latest.version_code)).build().toString();
-                    PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-                    if (packageInfo != null) {
-                        versionCode = packageInfo.versionCode;
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    Log.e("Update", "get version code error", e);
-                }
-
-                if (versionCode < data.latest.version_code) {
-                    data.latest.isNeedUpdate = true;
-                    UpdateDialogFragment updateDialogFragment;
-                    if (data.latest.force_upgraded) {
-                        updateDialogFragment = new ForceUpdateDialog();
-                    } else {
-                        if (isHasPreloadApk(data.latest.pkg_url)) {
-                            data.latest.preloadPath = SettingManager.getInstance().getApkPath(data.latest.pkg_url);
-                            updateDialogFragment = new PreloadUpdateDialog();
-                        } else {
-                            updateDialogFragment = new UpdateDialogFragment();
-                        }
-                    }
-                    Bundle args = new Bundle();
-                    args.putParcelable(Key.UPDATE_INFO, data.latest);
-                    updateDialogFragment.setArguments(args);
-                    updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
-                }
-
-                if (listener != null) {
-                    listener.onUpdate(data);
-                }
+                checkData(data.latest, activity, listener);
             }
 
             @Override
@@ -101,6 +74,44 @@ public class UpdateManager {
                 return "/api/app_version/detail";
             }
         }.exe();
+    }
+
+    private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
+        int versionCode = 0;
+        try {
+            latest.pkg_url = Uri.parse(latest.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(latest.version_code)).build().toString();
+            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            if (packageInfo != null) {
+                versionCode = packageInfo.versionCode;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("Update", "get version code error", e);
+        }
+
+        if (versionCode < latest.version_code) {
+            latest.isNeedUpdate = true;
+            UpdateDialogFragment updateDialogFragment;
+            if (latest.force_upgraded) {
+                updateDialogFragment = new ForceUpdateDialog();
+            } else {
+                if (isHasPreloadApk(latest.pkg_url)) {
+                    latest.preloadPath = SettingManager.getInstance().getApkPath(latest.pkg_url);
+                    updateDialogFragment = new PreloadUpdateDialog();
+                } else {
+                    updateDialogFragment = new UpdateDialogFragment();
+                }
+            }
+            Bundle args = new Bundle();
+            args.putParcelable(Key.UPDATE_INFO, latest);
+            updateDialogFragment.setArguments(args);
+            updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
+        }
+
+        if (listener != null) {
+            UpdateResponse.DataBean dataBean = new UpdateResponse.DataBean();
+            dataBean.latest = latest;
+            listener.onUpdate(dataBean);
+        }
     }
 
     public static boolean isHasPreloadApk(String pkg_url) {

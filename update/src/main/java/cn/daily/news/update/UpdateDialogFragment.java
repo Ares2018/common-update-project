@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.common.permission.AbsPermSingleCallBack;
 import com.zjrb.core.common.permission.IPermissionOperate;
 import com.zjrb.core.common.permission.Permission;
@@ -49,7 +50,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     LoadingIndicatorDialog mProgressBar;
 
     private Unbinder mUnBinder;
-    private UpdateResponse.DataBean.LatestBean mLatestBean;
+    private ResourceBiz.LatestVersionBean mLatestBean;
 
     @Nullable
     @Override
