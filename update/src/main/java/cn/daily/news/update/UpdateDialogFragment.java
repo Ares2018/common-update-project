@@ -61,7 +61,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         setCancelable(false);
 
         if (getArguments() != null) {
-            mLatestBean = getArguments().getParcelable(UpdateManager.Key.UPDATE_INFO);
+            mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
             mMsgView.setText(getRemark());
             mOkView.setText(getOKText());
             mTitleView.setText(getTitle());
@@ -98,7 +98,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dismiss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
-            args.putParcelable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
+            args.putSerializable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
         }

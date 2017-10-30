@@ -102,7 +102,7 @@ public class UpdateManager {
                 }
             }
             Bundle args = new Bundle();
-            args.putParcelable(Key.UPDATE_INFO, latest);
+            args.putSerializable(Key.UPDATE_INFO, latest);
             updateDialogFragment.setArguments(args);
             updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
         }
