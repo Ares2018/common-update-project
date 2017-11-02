@@ -52,6 +52,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     private Unbinder mUnBinder;
     private ResourceBiz.LatestVersionBean mLatestBean;
 
+    private DownloadUtil mDownloadUtil;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,6 +61,20 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         mUnBinder = ButterKnife.bind(this, rootView);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
         setCancelable(false);
+
+        PermissionManager.get().request(this, new AbsPermSingleCallBack() {
+            @Override
+            public void onGranted(boolean isAlreadyDef) {
+                mDownloadUtil = DownloadUtil.get()
+                        .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
+                        .setFileName(UpdateManager.Key.APK_NAME);
+            }
+
+            @Override
+            public void onDenied(List<String> neverAskPerms) {
+
+            }
+        }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
         if (getArguments() != null) {
             mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
@@ -146,13 +162,10 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismiss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
-            DownloadUtil.get()
-                    .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
-                    .setFileName(UpdateManager.Key.APK_NAME).setListener(new DownloadUtil.OnDownloadListener() {
+        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi() && mDownloadUtil != null) {
+            mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
                 @Override
                 public void onLoading(int progress) {
-
                 }
 
                 @Override
@@ -162,7 +175,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                 @Override
                 public void onFail(String err) {
-
                 }
             }).download(mLatestBean.pkg_url);
         }
@@ -197,7 +209,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     public void onDestroyView() {
         super.onDestroyView();
         mUnBinder.unbind();
-        DownloadUtil.get().setListener(null);
     }
 
     @Override

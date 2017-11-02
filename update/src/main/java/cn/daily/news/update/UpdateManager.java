@@ -12,9 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
 import com.zjrb.core.api.base.APIGetTask;
 import com.zjrb.core.api.callback.APICallBack;
 import com.zjrb.core.common.biz.ResourceBiz;
+import com.zjrb.core.db.SPHelper;
 import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
@@ -25,7 +27,7 @@ import java.io.File;
 
 public class UpdateManager {
 
-    public static void checkUpdate(AppCompatActivity appCompatActivity,ResourceBiz.LatestVersionBean latest_version) {
+    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
         checkData(latest_version, appCompatActivity, null);
     }
 
@@ -112,6 +114,22 @@ public class UpdateManager {
             dataBean.latest = latest;
             listener.onUpdate(dataBean);
         }
+    }
+
+    public static String getPreloadApkPath() {
+        String result = "";
+        ResourceBiz biz = SPHelper.get().getObject(SPHelper.Key.INITIALIZATION_RESOURCES);
+        if (biz != null && biz.latest_version != null && !TextUtils.isEmpty(biz.latest_version.pkg_url)) {
+            String url = Uri.parse(biz.latest_version.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(biz.latest_version.version_code)).build().toString();
+            if (isHasPreloadApk(url)) {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("path", SettingManager.getInstance().getApkPath(url));
+                jsonObject.addProperty("version", biz.latest_version.version_code);
+                Log.e("result",jsonObject.toString());
+                return jsonObject.toString();
+            }
+        }
+        return result;
     }
 
     public static boolean isHasPreloadApk(String pkg_url) {
