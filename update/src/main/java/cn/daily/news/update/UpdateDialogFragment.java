@@ -143,7 +143,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             public void onDenied(List<String> neverAskPerms) {
                 Toast.makeText(getContext(), "请给我写文件的权限", Toast.LENGTH_SHORT).show();
             }
-        }, Permission.STORAGE_WRITE);
+        }, Permission.STORAGE_WRITE,Permission.STORAGE_READE);
 
 
     }
