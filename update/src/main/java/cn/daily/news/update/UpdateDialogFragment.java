@@ -82,6 +82,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             mOkView.setText(getOKText());
             mTitleView.setText(getTitle());
         }
+
+        setCancelable(false);
         return rootView;
     }
 
