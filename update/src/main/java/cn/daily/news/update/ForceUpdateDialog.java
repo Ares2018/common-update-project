@@ -27,6 +27,6 @@ public class ForceUpdateDialog extends UpdateDialogFragment {
 
     @Override
     protected String getOKText() {
-        return "已在WIFI下为您预下载了最新版本"+mLatestBean.version+"(版本号),是否立即更新?";
+        return "更新";
     }
 }

@@ -104,7 +104,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected String getOKText() {
-        return "确定";
+        return "更新";
     }
 
 
