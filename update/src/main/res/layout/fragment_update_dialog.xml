@@ -83,7 +83,7 @@
                 android:layout_marginTop="13dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="取消"
+                android:text="下次再说"
                 android:textColor="?attr/tc_484848"
                 android:textSize="14sp" />
 
@@ -102,7 +102,7 @@
             android:layout_marginTop="13dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="更新"
+            android:text="确定"
             android:textColor="?tc_f44b50"
             android:textSize="14sp" />
     </LinearLayout>

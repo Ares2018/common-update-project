@@ -50,7 +50,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     LoadingIndicatorDialog mProgressBar;
 
     private Unbinder mUnBinder;
-    private ResourceBiz.LatestVersionBean mLatestBean;
+    protected ResourceBiz.LatestVersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
 
@@ -90,7 +90,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected String getTitle() {
-        return "更新提示";
+        return "检测到新版本V"+mLatestBean.version+"(版本号),立即更新?";
     }
 
     protected void setTitleVisible(int visible) {
@@ -102,7 +102,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected String getOKText() {
-        return "更新";
+        return "确定";
     }
 
 
