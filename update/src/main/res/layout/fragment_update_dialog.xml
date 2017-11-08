@@ -33,6 +33,7 @@
         android:layout_above="@+id/divider"
         android:layout_below="@+id/update_dialog_title"
         android:layout_centerVertical="true"
+        android:layout_weight="1"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp">
 
@@ -67,7 +68,7 @@
     <LinearLayout
         android:id="@+id/bottom_container"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:orientation="horizontal">
