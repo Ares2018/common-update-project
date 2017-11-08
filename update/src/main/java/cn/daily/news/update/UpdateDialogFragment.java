@@ -16,6 +16,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +64,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         mUnBinder = ButterKnife.bind(this, rootView);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
         setCancelable(false);
+
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
