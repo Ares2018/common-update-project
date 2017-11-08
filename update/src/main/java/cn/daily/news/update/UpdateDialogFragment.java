@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,7 +80,12 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
         if (getArguments() != null) {
             mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
-            mMsgView.setText(getRemark());
+            mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
+            if(mLatestBean!=null && !TextUtils.isEmpty(mLatestBean.remark)){
+                mMsgView.setText(Html.fromHtml(mLatestBean.remark));
+            }else{
+                mMsgView.setText("有新版本请更新!");
+            }
             mOkView.setText(getOKText());
             mTitleView.setText(getTitle());
         }
