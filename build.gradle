@@ -18,6 +18,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url "http://10.100.47.176:8086/nexus/content/groups/public" }
+        maven { url 'http://pre.haier.com/nexus/content/repositories/qdmobile-release/' }
     }
 }
 
