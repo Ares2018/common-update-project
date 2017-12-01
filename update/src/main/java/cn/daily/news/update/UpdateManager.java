@@ -34,6 +34,7 @@ public class UpdateManager {
         String UPDATE_INFO = "update_info";
         String APK_NAME = "zhejiang.apk";
         String VERSION_CODE = "version_code";
+        String SCHEME = "scheme";
     }
 
     public interface UpdateListener {
@@ -55,6 +56,7 @@ public class UpdateManager {
                     }
                     return;
                 }
+                data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
                 checkData(data.latest, activity, listener);
             }
 
@@ -80,7 +82,6 @@ public class UpdateManager {
     private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
         int versionCode = 0;
         try {
-            latest.pkg_url = Uri.parse(latest.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(latest.version_code)).build().toString();
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
             if (packageInfo != null) {
                 versionCode = packageInfo.versionCode;
@@ -119,12 +120,11 @@ public class UpdateManager {
         String result = "";
         ResourceBiz biz = SPHelper.get().getObject(SPHelper.Key.INITIALIZATION_RESOURCES);
         if (biz != null && biz.latest_version != null && !TextUtils.isEmpty(biz.latest_version.pkg_url)) {
-            String url = Uri.parse(biz.latest_version.pkg_url).buildUpon().appendQueryParameter(Key.VERSION_CODE, String.valueOf(biz.latest_version.version_code)).build().toString();
+            String url = biz.latest_version.pkg_url;
             if (isHasPreloadApk(url)) {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("path", SettingManager.getInstance().getApkPath(url));
                 jsonObject.addProperty("version", biz.latest_version.version_code);
-                Log.e("result",jsonObject.toString());
                 return jsonObject.toString();
             }
         }
@@ -163,5 +163,17 @@ public class UpdateManager {
             }
             context.startActivity(install);
         }
+    }
+
+    public static String getApkKey(String url, String version) {
+        try {
+            if (!TextUtils.isEmpty(url)) {
+                Uri uri = Uri.parse(url);
+                String scheme = uri.getScheme();
+                return uri.buildUpon().appendQueryParameter(Key.VERSION_CODE, version).appendQueryParameter(Key.SCHEME, scheme).build().toString();
+            }
+        } catch (Exception e) {
+        }
+        return url;
     }
 }

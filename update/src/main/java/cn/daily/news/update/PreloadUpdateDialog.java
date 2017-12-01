@@ -9,7 +9,7 @@ import android.view.View;
 public class PreloadUpdateDialog extends UpdateDialogFragment {
     @Override
     protected String getOKText() {
-        return "更新";
+        return "安装";
     }
 
     @Override
