@@ -85,8 +85,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         if (getArguments() != null) {
             mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-            if(mLatestBean!=null && !TextUtils.isEmpty(mLatestBean.remark)){
-                mMsgView.setText(Html.fromHtml(mLatestBean.remark));
+            if(mLatestBean!=null && !TextUtils.isEmpty(getRemark())){
+                mMsgView.setText(Html.fromHtml(getRemark()));
             }else{
                 mMsgView.setText("有新版本请更新!");
             }
@@ -147,7 +147,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 dismiss();
                 DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mLatestBean.pkg_url));
-                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
                 request.setTitle("浙江新闻");
                 request.setDescription("更新浙江新闻版本到" + mLatestBean.version);
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, UpdateManager.Key.APK_NAME);
