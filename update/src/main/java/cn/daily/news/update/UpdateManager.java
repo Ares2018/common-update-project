@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.zjrb.core.api.base.APIGetTask;
 import com.zjrb.core.api.callback.APICallBack;
 import com.zjrb.core.common.biz.ResourceBiz;
+import com.zjrb.core.common.manager.APICallManager;
 import com.zjrb.core.db.SPHelper;
 import com.zjrb.core.utils.SettingManager;
 
@@ -25,6 +26,7 @@ import java.io.File;
  */
 
 public class UpdateManager {
+    public static String TAG_TASK = "tag_task_update_manager";
 
     public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
         checkData(latest_version, appCompatActivity, null);
@@ -76,7 +78,11 @@ public class UpdateManager {
             protected String getApi() {
                 return "/api/app_version/detail";
             }
-        }.exe();
+        }.setTag(TAG_TASK).exe();
+    }
+
+    public static void cancel() {
+        APICallManager.get().cancel(TAG_TASK);
     }
 
     private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
