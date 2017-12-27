@@ -161,8 +161,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 dismiss();
-                mBuilder.setContentTitle(getString(R.string.app_name));
-                mBuilder.setContentText(getString(R.string.download_progress_tip) + mLatestBean.version);
+                mBuilder.setContentTitle(UIUtils.getString(R.string.app_name));
+                mBuilder.setContentText(UIUtils.getString(R.string.download_progress_tip) + mLatestBean.version);
                 mBuilder.setProgress(0, 0, true);
                 mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
@@ -189,7 +189,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                         PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(intent);
-                        mBuilder.setContentText(getString(R.string.download_complete_tip)).setProgress(0, 0, false);
+                        mBuilder.setContentText(UIUtils.getString(R.string.download_complete_tip)).setProgress(0, 0, false);
                         mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
                         mBuilder.setAutoCancel(true);
                         mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
@@ -201,7 +201,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                     @Override
                     public void onFail(String err) {
-                        mBuilder.setContentText(getString(R.string.download_error_tip)).setProgress(0, 0, false);
+                        mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);
                         mBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
                         mBuilder.setAutoCancel(true);
                         mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
