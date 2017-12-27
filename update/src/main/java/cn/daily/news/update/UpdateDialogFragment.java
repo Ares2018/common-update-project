@@ -88,7 +88,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             public void onGranted(boolean isAlreadyDef) {
                 mDownloadUtil = DownloadUtil.get()
                         .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
-                        .setFileName(UpdateManager.Key.APK_NAME);
+                        .setFileName(UIUtils.getString(R.string.app_name)+".apk");
             }
 
             @Override
