@@ -1,15 +1,17 @@
 package cn.daily.news.update;
 
 
-import android.app.DownloadManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -29,6 +31,7 @@ import com.zjrb.core.ui.widget.dialog.LoadingIndicatorDialog;
 import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.NetUtils;
 import com.zjrb.core.utils.SettingManager;
+import com.zjrb.core.utils.UIUtils;
 
 import java.util.List;
 
@@ -43,6 +46,8 @@ import cn.daily.news.analytics.Analytics;
  * A simple {@link Fragment} subclass.
  */
 public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate {
+    private static final int NOTIFY_PROGRESS_ID = 11111;
+    private static final long UPDATE_DURATION_TIME = 500;
     @BindView(R2.id.update_dialog_title)
     TextView mTitleView;
     @BindView(R2.id.update_dialog_msg)
@@ -57,6 +62,11 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     protected ResourceBiz.LatestVersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
+    private NotificationManager mNotificationManager;
+    private NotificationCompat.Builder mBuilder;
+
+    private long mUpdateTime = 0;
+
 
     @Nullable
     @Override
@@ -67,6 +77,11 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         setCancelable(false);
 
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilder = new NotificationCompat.Builder(UIUtils.getApp());
+        mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
+
 
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
@@ -85,9 +100,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         if (getArguments() != null) {
             mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-            if(mLatestBean!=null && !TextUtils.isEmpty(getRemark())){
+            if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
-            }else{
+            } else {
                 mMsgView.setText("有新版本请更新!");
             }
             mOkView.setText(getOKText());
@@ -103,7 +118,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected String getTitle() {
-        return "检测到新版本V"+mLatestBean.version+"(版本号),立即更新?";
+        return "检测到新版本V" + mLatestBean.version + "(版本号),立即更新?";
     }
 
     protected void setTitleVisible(int visible) {
@@ -132,12 +147,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dialog.show(getFragmentManager(), "updateDialog");
         }
 
-        new Analytics.AnalyticsBuilder(getContext(),"100011","100011")
+        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011")
                 .setEvenName("引导老版本用户升级安装点击")
                 .setPageType("引导页")
                 .build()
                 .send();
     }
+
 
     protected void downloadApk() {
 
@@ -145,23 +161,59 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 dismiss();
-                DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mLatestBean.pkg_url));
-                request.setTitle("浙江新闻");
-                request.setDescription("更新浙江新闻版本到" + mLatestBean.version);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, UpdateManager.Key.APK_NAME);
-                request.setMimeType("application/vnd.android.package-archive");
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                downloadManager.enqueue(request);
-                SettingManager.getInstance().setLastApkVersionCode(mLatestBean.version_code);
-                SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, null);
+                mBuilder.setContentTitle(getString(R.string.app_name));
+                mBuilder.setContentText(getString(R.string.download_progress_tip) + mLatestBean.version);
+                mBuilder.setProgress(0, 0, true);
+                mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
+
+                mUpdateTime = System.currentTimeMillis();
+
+                mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
+                    @Override
+                    public void onLoading(int progress) {
+                        if (System.currentTimeMillis() - mUpdateTime < UPDATE_DURATION_TIME) {
+                            return;
+                        }
+                        mUpdateTime = System.currentTimeMillis();
+                        mBuilder.setAutoCancel(false);
+                        mBuilder.setProgress(100, progress, false);
+                        mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
+                    }
+
+                    @Override
+                    public void onSuccess(String path) {
+                        Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
+                        data.setAction(UpdateManager.Action.DOWNLOAD_COMPLETE);
+                        data.putExtra(UpdateManager.Key.APK_URL, mLatestBean.pkg_url);
+                        data.putExtra(UpdateManager.Key.APK_PATH, path);
+
+                        PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(intent);
+                        mBuilder.setContentText(getString(R.string.download_complete_tip)).setProgress(0, 0, false);
+                        mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
+                        mBuilder.setAutoCancel(true);
+                        mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
+
+                        UIUtils.getApp().sendBroadcast(data);
+                        SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+
+                    }
+
+                    @Override
+                    public void onFail(String err) {
+                        mBuilder.setContentText(getString(R.string.download_error_tip)).setProgress(0, 0, false);
+                        mBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
+                        mBuilder.setAutoCancel(true);
+                        mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
+                    }
+                }).download(mLatestBean.pkg_url);
             }
 
             @Override
             public void onDenied(List<String> neverAskPerms) {
                 Toast.makeText(getContext(), "请给我写文件的权限", Toast.LENGTH_SHORT).show();
             }
-        }, Permission.STORAGE_WRITE,Permission.STORAGE_READE);
+        }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
 
     }
@@ -197,7 +249,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             }).download(mLatestBean.pkg_url);
         }
 
-        new Analytics.AnalyticsBuilder(getContext(),"100012","100012")
+        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012")
                 .setEvenName("升级弹框取消按钮点击")
                 .setPageType("引导页")
                 .build()

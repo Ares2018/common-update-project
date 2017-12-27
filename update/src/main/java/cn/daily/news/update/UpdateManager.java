@@ -37,6 +37,12 @@ public class UpdateManager {
         String APK_NAME = "zhejiang.apk";
         String VERSION_CODE = "version_code";
         String SCHEME = "scheme";
+        String APK_URL = "download_apk_url";
+        String APK_PATH = "download_apk_local_path";
+    }
+
+    interface Action {
+        String DOWNLOAD_COMPLETE = "download_complete";
     }
 
     public interface UpdateListener {
