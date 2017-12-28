@@ -27,14 +27,8 @@ import java.io.File;
 
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
-
-    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
-        checkData(latest_version, appCompatActivity, null);
-    }
-
     interface Key {
         String UPDATE_INFO = "update_info";
-        String APK_NAME = "zhejiang.apk";
         String VERSION_CODE = "version_code";
         String SCHEME = "scheme";
         String APK_URL = "download_apk_url";
@@ -43,6 +37,7 @@ public class UpdateManager {
 
     interface Action {
         String DOWNLOAD_COMPLETE = "download_complete";
+        String DOWNLOAD_RETRY = "download_retry";
     }
 
     public interface UpdateListener {
