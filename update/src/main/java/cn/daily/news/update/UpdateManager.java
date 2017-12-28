@@ -27,16 +27,19 @@ import java.io.File;
 
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
+
     interface Key {
         String UPDATE_INFO = "update_info";
         String VERSION_CODE = "version_code";
         String SCHEME = "scheme";
         String APK_URL = "download_apk_url";
         String APK_PATH = "download_apk_local_path";
+        String APK_VERSION = "download_apk_version";
     }
 
     interface Action {
         String DOWNLOAD_COMPLETE = "download_complete";
+        String DOWNLOAD_RETRY = "download_retry";
     }
 
     public interface UpdateListener {
@@ -119,25 +122,26 @@ public class UpdateManager {
     }
 
     public static boolean isHasPreloadApk(String pkg_url) {
-        try {
-            String path = SettingManager.getInstance().getApkPath(pkg_url);
-            if (!TextUtils.isEmpty(path)) {
-                File file = new File(path);
-                if (file.exists()) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
-        }
+//        try {
+//            String path = SettingManager.getInstance().getApkPath(pkg_url);
+//            if (!TextUtils.isEmpty(path)) {
+//                File file = new File(path);
+//                if (file.exists()) {
+//                    return true;
+//                }
+//            }
+//            return false;
+//        } catch (Exception e) {
+//            return false;
+//        }
+        return false;
     }
 
     private static String MIME_APK = "application/vnd.android.package-archive";
 
     public static void installApk(Context context, String path) {
         File file = new File(path);
-        if (file.exists()) {
+        if (file!=null && file.exists()) {
             Intent install = new Intent(Intent.ACTION_VIEW);
             install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             //兼容7.0私有文件权限

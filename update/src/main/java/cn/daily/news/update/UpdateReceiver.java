@@ -1,18 +1,21 @@
 package cn.daily.news.update;
 
-import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
+import android.os.Environment;
 
+import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
+import com.zjrb.core.utils.UIUtils;
 
 /**
  * Created by lixinke on 2017/10/23.
  */
 
 public class UpdateReceiver extends BroadcastReceiver {
+    private DownloadUtil mDownloadUtil;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (UpdateManager.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
@@ -20,8 +23,13 @@ public class UpdateReceiver extends BroadcastReceiver {
             String path = intent.getStringExtra(UpdateManager.Key.APK_PATH);
             SettingManager.getInstance().setApkPath(url, path);
             UpdateManager.installApk(context, path);
-        } else if (DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(intent.getAction())) {
-            Toast.makeText(context, "正在下载...", Toast.LENGTH_SHORT).show();
+        } else if (UpdateManager.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
+            String url = intent.getStringExtra(UpdateManager.Key.APK_URL);
+            String version=intent.getStringExtra(UpdateManager.Key.APK_VERSION);
+            mDownloadUtil = DownloadUtil.get()
+                    .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
+                    .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
+            new NotifyDownloadMananger(mDownloadUtil,version,url).startloadApk();
         }
     }
 }

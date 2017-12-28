@@ -1,17 +1,12 @@
 package cn.daily.news.update;
 
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -46,8 +41,6 @@ import cn.daily.news.analytics.Analytics;
  * A simple {@link Fragment} subclass.
  */
 public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate {
-    private static final int NOTIFY_PROGRESS_ID = 11111;
-    private static final long UPDATE_DURATION_TIME = 500;
     @BindView(R2.id.update_dialog_title)
     TextView mTitleView;
     @BindView(R2.id.update_dialog_msg)
@@ -62,10 +55,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     protected ResourceBiz.LatestVersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
-    private NotificationManager mNotificationManager;
-    private NotificationCompat.Builder mBuilder;
-
-    private long mUpdateTime = 0;
 
 
     @Nullable
@@ -78,17 +67,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        mBuilder = new NotificationCompat.Builder(UIUtils.getApp());
-        mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
-
 
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 mDownloadUtil = DownloadUtil.get()
                         .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
-                        .setFileName(UIUtils.getString(R.string.app_name)+".apk");
+                        .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
             }
 
             @Override
@@ -161,52 +146,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 dismiss();
-                mBuilder.setContentTitle(UIUtils.getString(R.string.app_name));
-                mBuilder.setContentText(UIUtils.getString(R.string.download_progress_tip) + mLatestBean.version);
-                mBuilder.setProgress(0, 0, true);
-                mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
-
-                mUpdateTime = System.currentTimeMillis();
-
-                mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
-                    @Override
-                    public void onLoading(int progress) {
-                        if (System.currentTimeMillis() - mUpdateTime < UPDATE_DURATION_TIME) {
-                            return;
-                        }
-                        mUpdateTime = System.currentTimeMillis();
-                        mBuilder.setAutoCancel(false);
-                        mBuilder.setProgress(100, progress, false);
-                        mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
-                    }
-
-                    @Override
-                    public void onSuccess(String path) {
-                        Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
-                        data.setAction(UpdateManager.Action.DOWNLOAD_COMPLETE);
-                        data.putExtra(UpdateManager.Key.APK_URL, mLatestBean.pkg_url);
-                        data.putExtra(UpdateManager.Key.APK_PATH, path);
-
-                        PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(intent);
-                        mBuilder.setContentText(UIUtils.getString(R.string.download_complete_tip)).setProgress(0, 0, false);
-                        mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
-                        mBuilder.setAutoCancel(true);
-                        mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
-
-                        UIUtils.getApp().sendBroadcast(data);
-                        SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
-
-                    }
-
-                    @Override
-                    public void onFail(String err) {
-                        mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);
-                        mBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
-                        mBuilder.setAutoCancel(true);
-                        mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
-                    }
-                }).download(mLatestBean.pkg_url);
+                new NotifyDownloadMananger(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startloadApk();
             }
 
             @Override
