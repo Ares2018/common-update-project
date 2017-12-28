@@ -27,14 +27,8 @@ import java.io.File;
 
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
-
-    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
-        checkData(latest_version, appCompatActivity, null);
-    }
-
     interface Key {
         String UPDATE_INFO = "update_info";
-        String APK_NAME = "zhejiang.apk";
         String VERSION_CODE = "version_code";
         String SCHEME = "scheme";
         String APK_URL = "download_apk_url";
@@ -51,31 +45,12 @@ public class UpdateManager {
         void onError(String errMsg, int errCode);
     }
 
-    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
-        new APIGetTask<UpdateResponse.DataBean>(new APICallBack<UpdateResponse.DataBean>() {
-            @Override
-            public void onSuccess(UpdateResponse.DataBean data) {
-                if (data == null || data.latest == null) {
-                    if (listener != null) {
-                        listener.onError("检测更新失败!", -1);
-                        if (BuildConfig.DEBUG) {
-                            Log.e("update", "服务端返回错误!");
-                        }
-                    }
-                    return;
-                }
-                data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
-                checkData(data.latest, activity, listener);
-            }
+    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
+        checkData(latest_version, appCompatActivity, null);
+    }
 
-            @Override
-            public void onError(String errMsg, int errCode) {
-                super.onError(errMsg, errCode);
-                if (listener != null) {
-                    listener.onError(errMsg, errCode);
-                }
-            }
-        }) {
+    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
+        new APIGetTask<UpdateResponse.DataBean>(new CheckUpdateCallBack(listener, activity)) {
             @Override
             protected void onSetupParams(Object... params) {
             }
@@ -187,5 +162,38 @@ public class UpdateManager {
         } catch (Exception e) {
         }
         return url;
+    }
+
+    private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {
+        private final UpdateListener mListener;
+        private final AppCompatActivity mActivity;
+
+        public CheckUpdateCallBack(UpdateListener listener, AppCompatActivity activity) {
+            mListener = listener;
+            mActivity = activity;
+        }
+
+        @Override
+        public void onSuccess(UpdateResponse.DataBean data) {
+            if (data == null || data.latest == null) {
+                if (mListener != null) {
+                    mListener.onError("检测更新失败!", -1);
+                    if (BuildConfig.DEBUG) {
+                        Log.e("update", "服务端返回错误!");
+                    }
+                }
+                return;
+            }
+            data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
+            checkData(data.latest, mActivity, mListener);
+        }
+
+        @Override
+        public void onError(String errMsg, int errCode) {
+            super.onError(errMsg, errCode);
+            if (mListener != null) {
+                mListener.onError(errMsg, errCode);
+            }
+        }
     }
 }
