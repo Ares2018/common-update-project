@@ -122,19 +122,18 @@ public class UpdateManager {
     }
 
     public static boolean isHasPreloadApk(String pkg_url) {
-//        try {
-//            String path = SettingManager.getInstance().getApkPath(pkg_url);
-//            if (!TextUtils.isEmpty(path)) {
-//                File file = new File(path);
-//                if (file.exists()) {
-//                    return true;
-//                }
-//            }
-//            return false;
-//        } catch (Exception e) {
-//            return false;
-//        }
-        return false;
+        try {
+            String path = SettingManager.getInstance().getApkPath(pkg_url);
+            if (!TextUtils.isEmpty(path)) {
+                File file = new File(path);
+                if (file.exists()) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static String MIME_APK = "application/vnd.android.package-archive";
