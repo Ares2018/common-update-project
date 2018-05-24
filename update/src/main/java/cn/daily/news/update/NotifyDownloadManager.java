@@ -14,7 +14,7 @@ import com.zjrb.core.utils.UIUtils;
  * Created by lixinke on 2017/12/28.
  */
 
-public class NotifyDownloadMananger {
+public class NotifyDownloadManager {
     private static final int NOTIFY_PROGRESS_ID = 11111;
     private static final long UPDATE_DURATION_TIME = 500;
     private NotificationCompat.Builder mBuilder;
@@ -24,7 +24,7 @@ public class NotifyDownloadMananger {
     private String mLastVersion;
     private String mApkUrl;
 
-    public NotifyDownloadMananger(DownloadUtil downloadUtil, String version, String apkUrl) {
+    public NotifyDownloadManager(DownloadUtil downloadUtil, String version, String apkUrl) {
         mDownloadUtil = downloadUtil;
         mLastVersion = version;
         mApkUrl = apkUrl;
@@ -34,7 +34,7 @@ public class NotifyDownloadMananger {
         mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
     }
 
-    public void startloadApk() {
+    public void startDownloadApk() {
         mBuilder.setContentTitle(UIUtils.getString(R.string.app_name));
         mBuilder.setContentText("更新" + UIUtils.getString(R.string.app_name) + "到" + mLastVersion);
         mBuilder.setProgress(0, 0, true);

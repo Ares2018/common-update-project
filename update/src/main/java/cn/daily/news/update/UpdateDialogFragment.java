@@ -146,7 +146,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 dismiss();
-                new NotifyDownloadMananger(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startloadApk();
+                new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
             }
 
             @Override

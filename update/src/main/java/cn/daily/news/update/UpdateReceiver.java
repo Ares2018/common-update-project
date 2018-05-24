@@ -29,7 +29,7 @@ public class UpdateReceiver extends BroadcastReceiver {
             mDownloadUtil = DownloadUtil.get()
                     .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
                     .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
-            new NotifyDownloadMananger(mDownloadUtil,version,url).startloadApk();
+            new NotifyDownloadManager(mDownloadUtil,version,url).startDownloadApk();
         }
     }
 }
