@@ -71,9 +71,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
             public void onGranted(boolean isAlreadyDef) {
-                mDownloadUtil = DownloadUtil.get()
-                        .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
-                        .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
+                initDownload();
             }
 
             @Override
@@ -146,6 +144,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             @Override
             public void onGranted(boolean isAlreadyDef) {
                 dismiss();
+                if (mDownloadUtil == null) {
+                    initDownload();
+                }
                 new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
             }
 
@@ -156,6 +157,12 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
 
+    }
+
+    private void initDownload() {
+        mDownloadUtil = DownloadUtil.get()
+                .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
+                .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
     }
 
     protected void forceDownloadApk() {
@@ -172,7 +179,10 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismiss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi() && mDownloadUtil != null) {
+        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
+            if (mDownloadUtil == null) {
+                initDownload();
+            }
             mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
                 @Override
                 public void onLoading(int progress) {
