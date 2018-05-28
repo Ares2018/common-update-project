@@ -1,5 +1,6 @@
 package cn.daily.news.update;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -30,7 +31,14 @@ public class NotifyDownloadManager {
         mApkUrl = apkUrl;
 
         mNotificationManager = (NotificationManager) UIUtils.getApp().getSystemService(Context.NOTIFICATION_SERVICE);
-        mBuilder = new NotificationCompat.Builder(UIUtils.getApp());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("1", "浙江新闻", NotificationManager.IMPORTANCE_LOW);
+            channel.enableLights(false);
+            channel.enableVibration(false);
+            channel.setShowBadge(false);
+            mNotificationManager.createNotificationChannel(channel);
+        }
+        mBuilder = new NotificationCompat.Builder(UIUtils.getApp(), "1");
         mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
     }
 
