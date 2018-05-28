@@ -122,7 +122,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         if (NetUtils.isWifi()) {
             downloadApk();
         } else {
-            dismiss();
+            dismissAllowingStateLoss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
             args.putSerializable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
@@ -143,7 +143,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
             public void onGranted(boolean isAlreadyDef) {
-                dismiss();
+                dismissAllowingStateLoss();
                 if (mDownloadUtil == null) {
                     initDownload();
                 }
@@ -178,7 +178,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
-        dismiss();
+        dismissAllowingStateLoss();
         if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
             if (mDownloadUtil == null) {
                 initDownload();
