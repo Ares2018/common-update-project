@@ -1,4 +1,4 @@
-package cn.daily.news.update;
+package cn.daily.news.update.notify;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +8,9 @@ import android.os.Environment;
 import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
+
+import cn.daily.news.update.R;
+import cn.daily.news.update.UpdateManager;
 
 /**
  * Created by lixinke on 2017/10/23.

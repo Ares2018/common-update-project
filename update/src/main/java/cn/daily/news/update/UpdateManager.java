@@ -21,6 +21,11 @@ import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
 
+import cn.daily.news.update.analytic.IAnalytic;
+import cn.daily.news.update.ui.ForceUpdateDialog;
+import cn.daily.news.update.ui.PreloadUpdateDialog;
+import cn.daily.news.update.ui.UpdateDialogFragment;
+
 /**
  * Created by lixinke on 2017/8/30.
  */
@@ -188,7 +193,7 @@ public class UpdateManager {
         }
     }
 
-    interface Key {
+    public interface Key {
         String UPDATE_INFO = "update_info";
         String VERSION_CODE = "version_code";
         String SCHEME = "scheme";
@@ -197,7 +202,7 @@ public class UpdateManager {
         String APK_VERSION = "download_apk_version";
     }
 
-    interface Action {
+   public interface Action {
         String DOWNLOAD_COMPLETE = "download_complete";
         String DOWNLOAD_RETRY = "download_retry";
     }
@@ -208,9 +213,7 @@ public class UpdateManager {
         void onError(String errMsg, int errCode);
     }
 
-    public interface IAnalytic {
-        void onAnalytic(UpdateType updateType, OperationType operationType);
-    }
+
 
     public static void setIAnalytic(IAnalytic IAnalytic) {
         sIAnalytic = IAnalytic;

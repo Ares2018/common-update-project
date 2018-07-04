@@ -1,4 +1,4 @@
-package cn.daily.news.update;
+package cn.daily.news.update.notify;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,6 +10,9 @@ import android.support.v4.app.NotificationCompat;
 import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
+
+import cn.daily.news.update.R;
+import cn.daily.news.update.UpdateManager;
 
 /**
  * Created by lixinke on 2017/12/28.
