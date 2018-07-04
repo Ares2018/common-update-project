@@ -27,25 +27,13 @@ import java.io.File;
 
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
+    private static String MIME_APK = "application/vnd.android.package-archive";
 
-    interface Key {
-        String UPDATE_INFO = "update_info";
-        String VERSION_CODE = "version_code";
-        String SCHEME = "scheme";
-        String APK_URL = "download_apk_url";
-        String APK_PATH = "download_apk_local_path";
-        String APK_VERSION = "download_apk_version";
-    }
+    private static IAnalytic sIAnalytic;
 
-    interface Action {
-        String DOWNLOAD_COMPLETE = "download_complete";
-        String DOWNLOAD_RETRY = "download_retry";
-    }
 
-    public interface UpdateListener {
-        void onUpdate(UpdateResponse.DataBean dataBean);
-
-        void onError(String errMsg, int errCode);
+    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
+        checkUpdate(activity, listener, "/api/app_version/detail");
     }
 
     public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
@@ -65,9 +53,6 @@ public class UpdateManager {
         }.setTag(TAG_TASK).exe();
     }
 
-    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
-        checkUpdate(activity, listener, "/api/app_version/detail");
-    }
 
     public static void cancel() {
         APICallManager.get().cancel(TAG_TASK);
@@ -140,7 +125,6 @@ public class UpdateManager {
         }
     }
 
-    private static String MIME_APK = "application/vnd.android.package-archive";
 
     public static void installApk(Context context, String path) {
         File file = new File(path);
@@ -202,5 +186,36 @@ public class UpdateManager {
                 mListener.onError(errMsg, errCode);
             }
         }
+    }
+
+    interface Key {
+        String UPDATE_INFO = "update_info";
+        String VERSION_CODE = "version_code";
+        String SCHEME = "scheme";
+        String APK_URL = "download_apk_url";
+        String APK_PATH = "download_apk_local_path";
+        String APK_VERSION = "download_apk_version";
+    }
+
+    interface Action {
+        String DOWNLOAD_COMPLETE = "download_complete";
+        String DOWNLOAD_RETRY = "download_retry";
+    }
+
+    public interface UpdateListener {
+        void onUpdate(UpdateResponse.DataBean dataBean);
+
+        void onError(String errMsg, int errCode);
+    }
+
+    public interface IAnalytic {
+        void onAnalytic(UpdateType updateType, OperationType operationType);
+    }
+
+    public static void setIAnalytic(IAnalytic IAnalytic) {
+        sIAnalytic = IAnalytic;
+    }
+    public static IAnalytic getIAnalytic() {
+        return sIAnalytic;
     }
 }

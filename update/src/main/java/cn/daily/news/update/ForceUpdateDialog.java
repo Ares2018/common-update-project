@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cn.daily.news.analytics.Analytics;
 
 /**
  * Created by lixinke on 2017/10/19.
@@ -25,11 +24,14 @@ public class ForceUpdateDialog extends UpdateDialogFragment {
     @Override
     public void updateApk(View view) {
         forceDownloadApk();
-        new Analytics.AnalyticsBuilder(getContext(),"100011","100011")
-                .setEvenName("引导老版本用户升级安装点击")
-                .setPageType("引导页")
-                .build()
-                .send();
+//        new Analytics.AnalyticsBuilder(getContext(),"100011","100011")
+//                .setEvenName("引导老版本用户升级安装点击")
+//                .setPageType("引导页")
+//                .build()
+//                .send();
+        if (UpdateManager.getIAnalytic() != null) {
+            UpdateManager.getIAnalytic().onAnalytic(UpdateType.FORCE, OperationType.UPDATE);
+        }
     }
 
     @Override
