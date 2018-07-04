@@ -48,11 +48,11 @@ public class UpdateManager {
         void onError(String errMsg, int errCode);
     }
 
-    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
+    public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
         checkData(latest_version, appCompatActivity, null);
     }
 
-    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
+    public static void checkUpdate(AppCompatActivity activity, UpdateListener listener, final String url) {
         new APIGetTask<UpdateResponse.DataBean>(new CheckUpdateCallBack(listener, activity)) {
             @Override
             protected void onSetupParams(Object... params) {
@@ -60,16 +60,20 @@ public class UpdateManager {
 
             @Override
             protected String getApi() {
-                return "/api/app_version/detail";
+                return url;
             }
         }.setTag(TAG_TASK).exe();
+    }
+
+    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
+        checkUpdate(activity, listener, "/api/app_version/detail");
     }
 
     public static void cancel() {
         APICallManager.get().cancel(TAG_TASK);
     }
 
-    private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
+    private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
         int versionCode = 0;
         try {
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
@@ -140,7 +144,7 @@ public class UpdateManager {
 
     public static void installApk(Context context, String path) {
         File file = new File(path);
-        if (file!=null && file.exists()) {
+        if (file != null && file.exists()) {
             Intent install = new Intent(Intent.ACTION_VIEW);
             install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             //兼容7.0私有文件权限

@@ -17,7 +17,6 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.common.permission.AbsPermSingleCallBack;
 import com.zjrb.core.common.permission.IPermissionOperate;
 import com.zjrb.core.common.permission.Permission;
@@ -52,7 +51,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     LoadingIndicatorDialog mProgressBar;
 
     private Unbinder mUnBinder;
-    protected ResourceBiz.LatestVersionBean mLatestBean;
+    protected VersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
 
@@ -81,7 +80,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
         if (getArguments() != null) {
-            mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
+            mLatestBean = (VersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
             if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
