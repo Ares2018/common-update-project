@@ -26,6 +26,7 @@ android {
 }
 
 dependencies {
+//    compile project(":core-library")
     compile ('cn.daily.android:core-library:5.3.2.5-SNAPSHOT'){
         exclude group:"cn.daily.android",module:"analytics"
     }
