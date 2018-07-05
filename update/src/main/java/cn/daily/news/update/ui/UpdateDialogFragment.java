@@ -175,6 +175,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             UpdateManager.installApk(getContext(), cachePath);
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
+            mProgressBar.setCancelable(false);
             mProgressBar.show();
             DownloadUtil.get().setListener(this).download(mLatestBean.pkg_url);
         }
