@@ -3,6 +3,7 @@ package cn.daily.news.update.notify;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 
 import com.zjrb.core.utils.DownloadUtil;
@@ -24,15 +25,23 @@ public class UpdateReceiver extends BroadcastReceiver {
         if (UpdateManager.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
             String url = intent.getStringExtra(UpdateManager.Key.APK_URL);
             String path = intent.getStringExtra(UpdateManager.Key.APK_PATH);
-            SettingManager.getInstance().setApkPath(url, path);
+            String versionCode = intent.getStringExtra(UpdateManager.Key.APK_VERSION_CODE);
+            String cachePath = null;
+            try {
+                cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE, String.valueOf(versionCode)).toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            SettingManager.getInstance().setApkCachePath(cachePath);
             UpdateManager.installApk(context, path);
         } else if (UpdateManager.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
             String url = intent.getStringExtra(UpdateManager.Key.APK_URL);
-            String version=intent.getStringExtra(UpdateManager.Key.APK_VERSION);
+            String versionName = intent.getStringExtra(UpdateManager.Key.APK_VERSION_NAME);
+            int versionCode = intent.getIntExtra(UpdateManager.Key.APK_VERSION_CODE, 0);
             mDownloadUtil = DownloadUtil.get()
                     .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
                     .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
-            new NotifyDownloadManager(mDownloadUtil,version,url).startDownloadApk();
+            new NotifyDownloadManager(mDownloadUtil, versionName, url, versionCode).startDownloadApk();
         }
     }
 }

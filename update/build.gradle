@@ -30,7 +30,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile ('cn.daily.android:core-library:5.2.1.6-SNAPSHOT'){
+    compile ('cn.daily.android:core-library:5.3.2.2-SNAPSHOT'){
         exclude group:"cn.daily.android",module:"analytics"
     }
 //    compile 'cn.daily.android:analytics:5.0.3.2-SNAPSHOT'

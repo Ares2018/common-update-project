@@ -2,4 +2,4 @@ include ':app', ':update'
 //include ':setting'
 //project(':setting').projectDir=new File('/Users/lixinke/Documents/workspace/daily/SettingProject/setting');
 //include(':core-library')
-//project(':core-library').projectDir=new File('/Users/lixinke/Documents/workspace/daily/CoreProject/core')
+//project(':core-library').projectDir=new File('../CoreProject/core')

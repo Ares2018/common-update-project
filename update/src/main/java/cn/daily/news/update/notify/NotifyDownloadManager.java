@@ -27,11 +27,13 @@ public class NotifyDownloadManager {
     private long mUpdateTime;
     private DownloadUtil mDownloadUtil;
     private String mLastVersion;
+    private String mLastVersionCode;
     private String mApkUrl;
 
-    public NotifyDownloadManager(DownloadUtil downloadUtil, String version, String apkUrl) {
+    public NotifyDownloadManager(DownloadUtil downloadUtil, String version, String apkUrl, int versionCode) {
         mDownloadUtil = downloadUtil;
         mLastVersion = version;
+        mLastVersionCode = String.valueOf(versionCode);
         mApkUrl = apkUrl;
 
         mNotificationManager = (NotificationManager) UIUtils.getApp().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -75,6 +77,7 @@ public class NotifyDownloadManager {
             data.setAction(UpdateManager.Action.DOWNLOAD_COMPLETE);
             data.putExtra(UpdateManager.Key.APK_URL, mApkUrl);
             data.putExtra(UpdateManager.Key.APK_PATH, path);
+            data.putExtra(UpdateManager.Key.APK_VERSION_CODE, mLastVersionCode);
 
             PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(intent);
@@ -84,8 +87,13 @@ public class NotifyDownloadManager {
             mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
             UIUtils.getApp().sendBroadcast(data);
-            SettingManager.getInstance().setApkPath(mApkUrl, path);
-
+//            String cachePath = null;
+//            try {
+//                cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE,mLastVersionCode).toString();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            SettingManager.getInstance().setApkCachePath(cachePath);
         }
 
         @Override
@@ -94,7 +102,7 @@ public class NotifyDownloadManager {
             Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
             data.setAction(UpdateManager.Action.DOWNLOAD_RETRY);
             data.putExtra(UpdateManager.Key.APK_URL, mApkUrl);
-            data.putExtra(UpdateManager.Key.APK_VERSION, mLastVersion);
+            data.putExtra(UpdateManager.Key.APK_VERSION_NAME, mLastVersion);
 
             PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);

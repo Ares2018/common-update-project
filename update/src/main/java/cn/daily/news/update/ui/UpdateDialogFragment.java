@@ -1,6 +1,7 @@
 package cn.daily.news.update.ui;
 
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -126,6 +127,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     public void updateApk(View view) {
         if (NetUtils.isWifi()) {
             downloadApk();
+            if (UpdateManager.getIAnalytic() != null) {
+                UpdateManager.getIAnalytic().onAnalytic(UpdateType.NORMAL, OperationType.UPDATE);
+            }
         } else {
             dismissAllowingStateLoss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
@@ -133,9 +137,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             args.putSerializable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
-        }
-        if (UpdateManager.getIAnalytic() != null) {
-            UpdateManager.getIAnalytic().onAnalytic(UpdateType.NORMAL, OperationType.UPDATE);
         }
     }
 
@@ -149,7 +150,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 if (mDownloadUtil == null) {
                     initDownload();
                 }
-                new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
+                new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url,mLatestBean.version_code).startDownloadApk();
             }
 
             @Override
@@ -168,7 +169,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void forceDownloadApk() {
-        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
+        if (UpdateManager.isHasPreloadApk(UpdateManager.getVersionCode(getContext()))) {
             mOkView.setText("安装");
             UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
         } else {
@@ -181,7 +182,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
+        if (!UpdateManager.isHasPreloadApk(UpdateManager.getVersionCode(getContext())) && NetUtils.isWifi()) {
             if (mDownloadUtil == null) {
                 initDownload();
             }
@@ -213,7 +214,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Override
     public void onSuccess(String path) {
         UpdateManager.installApk(getContext(), path);
-        SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+        String cachePath = null;
+        try {
+            cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SettingManager.getInstance().setApkCachePath(cachePath);
         mProgressBar.dismiss();
         mOkView.setEnabled(true);
         mOkView.setText("安装");

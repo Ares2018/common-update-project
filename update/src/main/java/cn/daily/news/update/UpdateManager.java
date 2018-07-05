@@ -3,6 +3,7 @@ package cn.daily.news.update;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,12 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
 import com.zjrb.core.api.base.APIGetTask;
 import com.zjrb.core.api.callback.APICallBack;
-import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.common.manager.APICallManager;
-import com.zjrb.core.db.SPHelper;
 import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
@@ -33,8 +31,8 @@ import cn.daily.news.update.ui.UpdateDialogFragment;
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
     private static String MIME_APK = "application/vnd.android.package-archive";
-
     private static IAnalytic sIAnalytic;
+    private static int sVersionCode = 0;
 
 
     public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
@@ -64,23 +62,13 @@ public class UpdateManager {
     }
 
     private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
-        int versionCode = 0;
-        try {
-            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-            if (packageInfo != null) {
-                versionCode = packageInfo.versionCode;
-            }
-        } catch (Exception e) {
-            Log.e("Update", "get version code error", e);
-        }
-
-        if (versionCode < latest.version_code) {
+        if (getVersionCode(activity) < latest.version_code) {
             latest.isNeedUpdate = true;
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
                 updateDialogFragment = new ForceUpdateDialog();
             } else {
-                if (isHasPreloadApk(latest.pkg_url)) {
+                if (isHasPreloadApk(getVersionCode(activity))) {
                     latest.preloadPath = SettingManager.getInstance().getApkPath(latest.pkg_url);
                     updateDialogFragment = new PreloadUpdateDialog();
                 } else {
@@ -100,10 +88,16 @@ public class UpdateManager {
         }
     }
 
-    public static boolean isHasPreloadApk(String pkg_url) {
+    public static boolean isHasPreloadApk(int versionCode) {
         try {
-            String path = SettingManager.getInstance().getApkPath(pkg_url);
+            String path = SettingManager.getInstance().getApkCachePath();
             if (!TextUtils.isEmpty(path)) {
+                Uri uri = Uri.parse(path);
+                String code = uri.getQueryParameter(Key.APK_VERSION_CODE);
+                if (Integer.parseInt(code) < versionCode) {
+                    return false;
+                }
+                path = uri.getPath();
                 File file = new File(path);
                 if (file.exists()) {
                     return true;
@@ -131,6 +125,24 @@ public class UpdateManager {
             }
             context.startActivity(install);
         }
+    }
+
+    public static int getVersionCode(Context context) {
+        if (context == null) {
+            return 0;
+        }
+        if (sVersionCode > 0) {
+            return sVersionCode;
+        }
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
+            if (packageInfo != null) {
+                sVersionCode = packageInfo.versionCode;
+            }
+        } catch (Exception e) {
+            Log.e("Update", "get version code error", e);
+        }
+        return sVersionCode;
     }
 
     private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {
@@ -168,14 +180,14 @@ public class UpdateManager {
 
     public interface Key {
         String UPDATE_INFO = "update_info";
-        String VERSION_CODE = "version_code";
+        String APK_VERSION_CODE = "versionCode";
         String SCHEME = "scheme";
         String APK_URL = "download_apk_url";
         String APK_PATH = "download_apk_local_path";
-        String APK_VERSION = "download_apk_version";
+        String APK_VERSION_NAME = "download_apk_version";
     }
 
-   public interface Action {
+    public interface Action {
         String DOWNLOAD_COMPLETE = "download_complete";
         String DOWNLOAD_RETRY = "download_retry";
     }
@@ -187,10 +199,10 @@ public class UpdateManager {
     }
 
 
-
     public static void setIAnalytic(IAnalytic IAnalytic) {
         sIAnalytic = IAnalytic;
     }
+
     public static IAnalytic getIAnalytic() {
         return sIAnalytic;
     }
