@@ -165,7 +165,6 @@ public class UpdateManager {
                 }
                 return;
             }
-//            data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
             checkData(data.latest, mActivity, mListener);
         }
 

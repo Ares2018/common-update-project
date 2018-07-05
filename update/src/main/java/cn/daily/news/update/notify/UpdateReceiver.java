@@ -23,7 +23,6 @@ public class UpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (UpdateManager.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
-            String url = intent.getStringExtra(UpdateManager.Key.APK_URL);
             String path = intent.getStringExtra(UpdateManager.Key.APK_PATH);
             String versionCode = intent.getStringExtra(UpdateManager.Key.APK_VERSION_CODE);
             String cachePath = null;
@@ -41,7 +40,7 @@ public class UpdateReceiver extends BroadcastReceiver {
             mDownloadUtil = DownloadUtil.get()
                     .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
                     .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
-            new NotifyDownloadManager(mDownloadUtil, versionName, url, versionCode).startDownloadApk();
+            new NotifyDownloadManager(context,mDownloadUtil, versionName, url, versionCode).startDownloadApk();
         }
     }
 }

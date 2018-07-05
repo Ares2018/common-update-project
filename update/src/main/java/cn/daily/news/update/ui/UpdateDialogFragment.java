@@ -150,7 +150,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 if (mDownloadUtil == null) {
                     initDownload();
                 }
-                new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url,mLatestBean.version_code).startDownloadApk();
+                new NotifyDownloadManager(getContext(),mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url,mLatestBean.version_code).startDownloadApk();
             }
 
             @Override

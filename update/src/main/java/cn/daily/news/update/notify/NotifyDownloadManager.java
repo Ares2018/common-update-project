@@ -29,14 +29,16 @@ public class NotifyDownloadManager {
     private String mLastVersion;
     private String mLastVersionCode;
     private String mApkUrl;
+    private Context mContext;
 
-    public NotifyDownloadManager(DownloadUtil downloadUtil, String version, String apkUrl, int versionCode) {
+    public NotifyDownloadManager(Context context, DownloadUtil downloadUtil, String version, String apkUrl, int versionCode) {
+        mContext = context;
         mDownloadUtil = downloadUtil;
         mLastVersion = version;
         mLastVersionCode = String.valueOf(versionCode);
         mApkUrl = apkUrl;
 
-        mNotificationManager = (NotificationManager) UIUtils.getApp().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("1", "浙江新闻", NotificationManager.IMPORTANCE_LOW);
             channel.enableLights(false);
@@ -44,7 +46,7 @@ public class NotifyDownloadManager {
             channel.setShowBadge(false);
             mNotificationManager.createNotificationChannel(channel);
         }
-        mBuilder = new NotificationCompat.Builder(UIUtils.getApp(), "1");
+        mBuilder = new NotificationCompat.Builder(mContext, "1");
         mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
     }
 
@@ -73,38 +75,31 @@ public class NotifyDownloadManager {
 
         @Override
         public void onSuccess(String path) {
-            Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
+            Intent data = new Intent(mContext, UpdateReceiver.class);
             data.setAction(UpdateManager.Action.DOWNLOAD_COMPLETE);
             data.putExtra(UpdateManager.Key.APK_URL, mApkUrl);
             data.putExtra(UpdateManager.Key.APK_PATH, path);
             data.putExtra(UpdateManager.Key.APK_VERSION_CODE, mLastVersionCode);
 
-            PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent intent = PendingIntent.getBroadcast(mContext, 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(intent);
             mBuilder.setContentText(UIUtils.getString(R.string.download_complete_tip)).setProgress(0, 0, false);
             mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
             mBuilder.setAutoCancel(true);
             mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
-            UIUtils.getApp().sendBroadcast(data);
-//            String cachePath = null;
-//            try {
-//                cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE,mLastVersionCode).toString();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            SettingManager.getInstance().setApkCachePath(cachePath);
+            mContext.sendBroadcast(data);
         }
 
         @Override
         public void onFail(String err) {
 
-            Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
+            Intent data = new Intent(mContext, UpdateReceiver.class);
             data.setAction(UpdateManager.Action.DOWNLOAD_RETRY);
             data.putExtra(UpdateManager.Key.APK_URL, mApkUrl);
             data.putExtra(UpdateManager.Key.APK_VERSION_NAME, mLastVersion);
 
-            PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent intent = PendingIntent.getBroadcast(mContext, 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);
             mBuilder.setContentIntent(intent);
             mBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
