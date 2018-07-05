@@ -100,21 +100,6 @@ public class UpdateManager {
         }
     }
 
-    public static String getPreloadApkPath() {
-        String result = "";
-        ResourceBiz biz = SPHelper.get().getObject(SPHelper.Key.INITIALIZATION_RESOURCES);
-        if (biz != null && biz.latest_version != null && !TextUtils.isEmpty(biz.latest_version.pkg_url)) {
-            String url = biz.latest_version.pkg_url;
-            if (isHasPreloadApk(url)) {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("path", SettingManager.getInstance().getApkPath(url));
-                jsonObject.addProperty("version", biz.latest_version.version_code);
-                return jsonObject.toString();
-            }
-        }
-        return result;
-    }
-
     public static boolean isHasPreloadApk(String pkg_url) {
         try {
             String path = SettingManager.getInstance().getApkPath(pkg_url);
@@ -148,18 +133,6 @@ public class UpdateManager {
         }
     }
 
-    public static String getApkKey(String url, String version) {
-        try {
-            if (!TextUtils.isEmpty(url)) {
-                Uri uri = Uri.parse(url);
-                String scheme = uri.getScheme();
-                return uri.buildUpon().appendQueryParameter(Key.VERSION_CODE, version).appendQueryParameter(Key.SCHEME, scheme).build().toString();
-            }
-        } catch (Exception e) {
-        }
-        return url;
-    }
-
     private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {
         private final UpdateListener mListener;
         private final AppCompatActivity mActivity;
@@ -180,7 +153,7 @@ public class UpdateManager {
                 }
                 return;
             }
-            data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
+//            data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
             checkData(data.latest, mActivity, mListener);
         }
 

@@ -9,6 +9,6 @@ public class VersionBean implements Serializable {
     public boolean force_upgraded;
     public String remark;
 
-    protected boolean isNeedUpdate;
+    public boolean isNeedUpdate;
     protected String preloadPath;
 }
