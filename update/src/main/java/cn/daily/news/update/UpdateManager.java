@@ -63,13 +63,11 @@ public class UpdateManager {
 
     private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
         if (getVersionCode(activity) < latest.version_code) {
-            latest.isNeedUpdate = true;
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
                 updateDialogFragment = new ForceUpdateDialog();
             } else {
                 if (isHasPreloadApk(getVersionCode(activity))) {
-                    latest.preloadPath = SettingManager.getInstance().getApkPath(latest.pkg_url);
                     updateDialogFragment = new PreloadUpdateDialog();
                 } else {
                     updateDialogFragment = new UpdateDialogFragment();
