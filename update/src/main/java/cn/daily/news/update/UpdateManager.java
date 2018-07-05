@@ -62,12 +62,14 @@ public class UpdateManager {
     }
 
     private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
+        latest.force_upgraded = true;
         if (getVersionCode(activity) < latest.version_code) {
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
                 updateDialogFragment = new ForceUpdateDialog();
             } else {
-                if (isHasPreloadApk(getVersionCode(activity))) {
+                String cachePath = getPreloadApk(getVersionCode(activity));
+                if (!TextUtils.isEmpty(cachePath)) {
                     updateDialogFragment = new PreloadUpdateDialog();
                 } else {
                     updateDialogFragment = new UpdateDialogFragment();
@@ -86,24 +88,24 @@ public class UpdateManager {
         }
     }
 
-    public static boolean isHasPreloadApk(int versionCode) {
+    public static String getPreloadApk(int versionCode) {
         try {
             String path = SettingManager.getInstance().getApkCachePath();
             if (!TextUtils.isEmpty(path)) {
                 Uri uri = Uri.parse(path);
                 String code = uri.getQueryParameter(Key.APK_VERSION_CODE);
                 if (Integer.parseInt(code) < versionCode) {
-                    return false;
+                    return null;
                 }
                 path = uri.getPath();
                 File file = new File(path);
                 if (file.exists()) {
-                    return true;
+                    return file.getAbsolutePath();
                 }
             }
-            return false;
+            return null;
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 

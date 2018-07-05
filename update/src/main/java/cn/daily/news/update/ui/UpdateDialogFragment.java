@@ -150,7 +150,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 if (mDownloadUtil == null) {
                     initDownload();
                 }
-                new NotifyDownloadManager(getContext(),mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url,mLatestBean.version_code).startDownloadApk();
+                new NotifyDownloadManager(getContext(), mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url, mLatestBean.version_code).startDownloadApk();
             }
 
             @Override
@@ -169,9 +169,10 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void forceDownloadApk() {
-        if (UpdateManager.isHasPreloadApk(UpdateManager.getVersionCode(getContext()))) {
+        String cachePath = UpdateManager.getPreloadApk(UpdateManager.getVersionCode(getContext()));
+        if (!TextUtils.isEmpty(cachePath)) {
             mOkView.setText("安装");
-            UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+            UpdateManager.installApk(getContext(), cachePath);
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
             mProgressBar.show();
@@ -182,7 +183,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(UpdateManager.getVersionCode(getContext())) && NetUtils.isWifi()) {
+        String cachePath = UpdateManager.getPreloadApk(UpdateManager.getVersionCode(getContext()));
+        if (TextUtils.isEmpty(cachePath) && NetUtils.isWifi()) {
             if (mDownloadUtil == null) {
                 initDownload();
             }
@@ -193,7 +195,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                 @Override
                 public void onSuccess(String path) {
-                    SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+                    String cachePath = null;
+                    try {
+                        cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    SettingManager.getInstance().setApkCachePath(cachePath);
                 }
 
                 @Override
@@ -227,7 +235,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void installPreloadApk() {
-        UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+        UpdateManager.installApk(getContext(),UpdateManager.getPreloadApk(UpdateManager.getVersionCode(getContext())));
     }
 
     @Override
