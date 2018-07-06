@@ -17,6 +17,8 @@ import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
 
+import cn.daily.news.update.listener.OnOperateListener;
+import cn.daily.news.update.listener.OnUpdateListener;
 import cn.daily.news.update.task.UpdateTask;
 import cn.daily.news.update.ui.ForceUpdateDialog;
 import cn.daily.news.update.ui.PreloadUpdateDialog;

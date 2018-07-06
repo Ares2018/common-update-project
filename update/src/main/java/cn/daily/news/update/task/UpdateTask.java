@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import com.zjrb.core.api.base.APIGetTask;
 import com.zjrb.core.api.callback.APICallBack;
 
-import cn.daily.news.update.OnUpdateListener;
+import cn.daily.news.update.listener.OnUpdateListener;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateResponse;
 

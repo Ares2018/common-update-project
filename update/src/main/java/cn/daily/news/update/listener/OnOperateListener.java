@@ -1,4 +1,4 @@
-package cn.daily.news.update;
+package cn.daily.news.update.listener;
 
 import cn.daily.news.update.type.UpdateType;
 
