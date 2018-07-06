@@ -12,14 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.zjrb.core.api.base.APIGetTask;
-import com.zjrb.core.api.callback.APICallBack;
 import com.zjrb.core.common.manager.APICallManager;
 import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
 
-import cn.daily.news.update.analytic.IAnalytic;
+import cn.daily.news.update.task.UpdateTask;
 import cn.daily.news.update.ui.ForceUpdateDialog;
 import cn.daily.news.update.ui.PreloadUpdateDialog;
 import cn.daily.news.update.ui.UpdateDialogFragment;
@@ -29,42 +27,56 @@ import cn.daily.news.update.ui.UpdateDialogFragment;
  */
 
 public class UpdateManager {
-    public static String TAG_TASK = "tag_task_update_manager";
+    private static String TAG_TASK = "tag_task_update";
     private static String MIME_APK = "application/vnd.android.package-archive";
-    private static IAnalytic sIAnalytic;
-    private static int sVersionCode = 0;
+
+    private static UpdateManager sInstance = new UpdateManager();
+    private OnUpdateListener mOnUpdateListener;
+    private OnOperateListener mOnOperateListener;
+    private int mVersionCode = 0;
 
 
-    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
-        checkUpdate(activity, listener, "/api/app_version/detail");
+    public static UpdateManager getInstance() {
+        return sInstance;
     }
 
-    public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
-        checkData(latest_version, appCompatActivity, null);
+    /**
+     * 检测更新，浙江新闻使用
+     *
+     * @param activity
+     */
+    public void checkUpdate(AppCompatActivity activity) {
+        UpdateTask.createTask(activity, null, TAG_TASK);
     }
 
-    public static void checkUpdate(AppCompatActivity activity, UpdateListener listener, final String url) {
-        new APIGetTask<UpdateResponse.DataBean>(new CheckUpdateCallBack(listener, activity)) {
-            @Override
-            protected void onSetupParams(Object... params) {
-            }
-
-            @Override
-            protected String getApi() {
-                return url;
-            }
-        }.setTag(TAG_TASK).exe();
-    }
-
-
-    public static void cancel() {
+    /**
+     * 取消网络请求
+     */
+    public void cancel() {
         APICallManager.get().cancel(TAG_TASK);
     }
 
-    private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
-        if (getVersionCode(activity) < latest.version_code) {
+    /**
+     * 对外检测更新
+     *
+     * @param activity
+     * @param bean
+     */
+    public void checkUpdate(AppCompatActivity activity, VersionBean bean) {
+        checkData(activity, bean);
+    }
+
+
+    /**
+     * 根据VersionBean显示不同的更新提示框
+     *
+     * @param activity
+     * @param versionBean
+     */
+    private void checkData(AppCompatActivity activity, VersionBean versionBean) {
+        if (getVersionCode(activity) < versionBean.version_code) {
             UpdateDialogFragment updateDialogFragment;
-            if (latest.force_upgraded) {
+            if (versionBean.force_upgraded) {
                 updateDialogFragment = new ForceUpdateDialog();
             } else {
                 String cachePath = getPreloadApk(getVersionCode(activity));
@@ -75,24 +87,31 @@ public class UpdateManager {
                 }
             }
             Bundle args = new Bundle();
-            args.putSerializable(Key.UPDATE_INFO, latest);
+            args.putSerializable(Constants.Key.UPDATE_INFO, versionBean);
             updateDialogFragment.setArguments(args);
             updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
         }
 
-        if (listener != null) {
+        if (mOnUpdateListener != null) {
             UpdateResponse.DataBean dataBean = new UpdateResponse.DataBean();
-            dataBean.latest = latest;
-            listener.onUpdate(dataBean);
+            dataBean.latest = versionBean;
+            mOnUpdateListener.onUpdate(dataBean);
         }
     }
 
-    public static String getPreloadApk(int versionCode) {
+    //TODO 当前的问题是包没有完全下载成功时也会认为是可安装包。
+    /**
+     * 获取预加载的包，防止重复下载
+     *
+     * @param versionCode
+     * @return
+     */
+    public String getPreloadApk(int versionCode) {
         try {
             String path = SettingManager.getInstance().getApkCachePath();
             if (!TextUtils.isEmpty(path)) {
                 Uri uri = Uri.parse(path);
-                String code = uri.getQueryParameter(Key.APK_VERSION_CODE);
+                String code = uri.getQueryParameter(Constants.Key.APK_VERSION_CODE);
                 if (Integer.parseInt(code) < versionCode) {
                     return null;
                 }
@@ -109,6 +128,12 @@ public class UpdateManager {
     }
 
 
+    /**
+     * 下载完成后后安装APK命令
+     *
+     * @param context
+     * @param path
+     */
     public static void installApk(Context context, String path) {
         File file = new File(path);
         if (file != null && file.exists()) {
@@ -126,82 +151,44 @@ public class UpdateManager {
         }
     }
 
-    public static int getVersionCode(Context context) {
+    /**
+     * 获取当前应用的版本号
+     *
+     * @param context
+     * @return
+     */
+    public int getVersionCode(Context context) {
         if (context == null) {
             return 0;
         }
-        if (sVersionCode > 0) {
-            return sVersionCode;
+        if (mVersionCode > 0) {
+            return mVersionCode;
         }
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
             if (packageInfo != null) {
-                sVersionCode = packageInfo.versionCode;
+                mVersionCode = packageInfo.versionCode;
             }
         } catch (Exception e) {
             Log.e("Update", "get version code error", e);
         }
-        return sVersionCode;
-    }
-
-    private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {
-        private final UpdateListener mListener;
-        private final AppCompatActivity mActivity;
-
-        public CheckUpdateCallBack(UpdateListener listener, AppCompatActivity activity) {
-            mListener = listener;
-            mActivity = activity;
-        }
-
-        @Override
-        public void onSuccess(UpdateResponse.DataBean data) {
-            if (data == null || data.latest == null) {
-                if (mListener != null) {
-                    mListener.onError("检测更新失败!", -1);
-                    if (BuildConfig.DEBUG) {
-                        Log.e("update", "服务端返回错误!");
-                    }
-                }
-                return;
-            }
-            checkData(data.latest, mActivity, mListener);
-        }
-
-        @Override
-        public void onError(String errMsg, int errCode) {
-            super.onError(errMsg, errCode);
-            if (mListener != null) {
-                mListener.onError(errMsg, errCode);
-            }
-        }
-    }
-
-    public interface Key {
-        String UPDATE_INFO = "update_info";
-        String APK_VERSION_CODE = "versionCode";
-        String SCHEME = "scheme";
-        String APK_URL = "download_apk_url";
-        String APK_PATH = "download_apk_local_path";
-        String APK_VERSION_NAME = "download_apk_version";
-    }
-
-    public interface Action {
-        String DOWNLOAD_COMPLETE = "download_complete";
-        String DOWNLOAD_RETRY = "download_retry";
-    }
-
-    public interface UpdateListener {
-        void onUpdate(UpdateResponse.DataBean dataBean);
-
-        void onError(String errMsg, int errCode);
+        return mVersionCode;
     }
 
 
-    public static void setIAnalytic(IAnalytic IAnalytic) {
-        sIAnalytic = IAnalytic;
+    public synchronized OnUpdateListener getOnUpdateListener() {
+        return mOnUpdateListener;
     }
 
-    public static IAnalytic getIAnalytic() {
-        return sIAnalytic;
+    public synchronized OnOperateListener getOnOperateListener() {
+        return mOnOperateListener;
+    }
+
+    public synchronized void setOnUpdateListener(OnUpdateListener onUpdateListener) {
+        mOnUpdateListener = onUpdateListener;
+    }
+
+    public synchronized void setOnOperateListener(OnOperateListener onOperateListener) {
+        mOnOperateListener = onOperateListener;
     }
 }

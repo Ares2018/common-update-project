@@ -10,6 +10,7 @@ import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
 
+import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 
@@ -22,21 +23,21 @@ public class UpdateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (UpdateManager.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
-            String path = intent.getStringExtra(UpdateManager.Key.APK_PATH);
-            String versionCode = intent.getStringExtra(UpdateManager.Key.APK_VERSION_CODE);
+        if (Constants.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
+            String path = intent.getStringExtra(Constants.Key.APK_PATH);
+            String versionCode = intent.getStringExtra(Constants.Key.APK_VERSION_CODE);
             String cachePath = null;
             try {
-                cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE, String.valueOf(versionCode)).toString();
+                cachePath = Uri.parse(path).buildUpon().appendQueryParameter(Constants.Key.APK_VERSION_CODE, String.valueOf(versionCode)).toString();
             } catch (Exception e) {
                 e.printStackTrace();
             }
             SettingManager.getInstance().setApkCachePath(cachePath);
             UpdateManager.installApk(context, path);
-        } else if (UpdateManager.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
-            String url = intent.getStringExtra(UpdateManager.Key.APK_URL);
-            String versionName = intent.getStringExtra(UpdateManager.Key.APK_VERSION_NAME);
-            int versionCode = intent.getIntExtra(UpdateManager.Key.APK_VERSION_CODE, 0);
+        } else if (Constants.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
+            String url = intent.getStringExtra(Constants.Key.APK_URL);
+            String versionName = intent.getStringExtra(Constants.Key.APK_VERSION_NAME);
+            int versionCode = intent.getIntExtra(Constants.Key.APK_VERSION_CODE, 0);
             mDownloadUtil = DownloadUtil.get()
                     .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
                     .setFileName(UIUtils.getString(R.string.app_name) + ".apk");

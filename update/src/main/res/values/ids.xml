@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="update_ok" type="id">update_ok</item>
+    <item name="update_cancel" type="id">update_cancel</item>
+</resources>

@@ -6,9 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import cn.daily.news.update.analytic.OperationType;
+import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
-import cn.daily.news.update.analytic.UpdateType;
+import cn.daily.news.update.type.UpdateType;
 
 
 /**
@@ -38,8 +38,8 @@ public class NonWiFiUpdateDialog extends UpdateDialogFragment {
     @Override
     public void updateApk(View view) {
         downloadApk();
-        if(UpdateManager.getIAnalytic()!=null){
-            UpdateManager.getIAnalytic().onAnalytic(UpdateType.NON_WIFI, OperationType.UPDATE);
+        if(UpdateManager.getInstance().getOnOperateListener()!=null){
+            UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NON_WIFI, R.id.update_ok);
         }
     }
 }

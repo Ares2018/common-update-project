@@ -12,6 +12,7 @@ import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
 
+import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 
@@ -76,10 +77,10 @@ public class NotifyDownloadManager {
         @Override
         public void onSuccess(String path) {
             Intent data = new Intent(mContext, UpdateReceiver.class);
-            data.setAction(UpdateManager.Action.DOWNLOAD_COMPLETE);
-            data.putExtra(UpdateManager.Key.APK_URL, mApkUrl);
-            data.putExtra(UpdateManager.Key.APK_PATH, path);
-            data.putExtra(UpdateManager.Key.APK_VERSION_CODE, mLastVersionCode);
+            data.setAction(Constants.Action.DOWNLOAD_COMPLETE);
+            data.putExtra(Constants.Key.APK_URL, mApkUrl);
+            data.putExtra(Constants.Key.APK_PATH, path);
+            data.putExtra(Constants.Key.APK_VERSION_CODE, mLastVersionCode);
 
             PendingIntent intent = PendingIntent.getBroadcast(mContext, 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(intent);
@@ -95,9 +96,9 @@ public class NotifyDownloadManager {
         public void onFail(String err) {
 
             Intent data = new Intent(mContext, UpdateReceiver.class);
-            data.setAction(UpdateManager.Action.DOWNLOAD_RETRY);
-            data.putExtra(UpdateManager.Key.APK_URL, mApkUrl);
-            data.putExtra(UpdateManager.Key.APK_VERSION_NAME, mLastVersion);
+            data.setAction(Constants.Action.DOWNLOAD_RETRY);
+            data.putExtra(Constants.Key.APK_URL, mApkUrl);
+            data.putExtra(Constants.Key.APK_VERSION_NAME, mLastVersion);
 
             PendingIntent intent = PendingIntent.getBroadcast(mContext, 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);

@@ -34,13 +34,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import cn.daily.news.update.Constants;
 import cn.daily.news.update.notify.NotifyDownloadManager;
-import cn.daily.news.update.analytic.OperationType;
 import cn.daily.news.update.R;
 import cn.daily.news.update.R2;
 import cn.daily.news.update.UpdateManager;
-import cn.daily.news.update.analytic.UpdateType;
 import cn.daily.news.update.VersionBean;
+import cn.daily.news.update.type.UpdateType;
 
 
 /**
@@ -70,7 +70,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         mUnBinder = ButterKnife.bind(this, rootView);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
         setCancelable(false);
-
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 
@@ -87,7 +86,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
         if (getArguments() != null) {
-            mLatestBean = (VersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
+            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
             if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
@@ -127,14 +126,14 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     public void updateApk(View view) {
         if (NetUtils.isWifi()) {
             downloadApk();
-            if (UpdateManager.getIAnalytic() != null) {
-                UpdateManager.getIAnalytic().onAnalytic(UpdateType.NORMAL, OperationType.UPDATE);
+            if (UpdateManager.getInstance().getOnOperateListener() != null) {
+                UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NORMAL, R.id.update_ok);
             }
         } else {
             dismissAllowingStateLoss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
-            args.putSerializable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
+            args.putSerializable(Constants.Key.UPDATE_INFO, mLatestBean);
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
         }
@@ -169,7 +168,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void forceDownloadApk() {
-        String cachePath = UpdateManager.getPreloadApk(UpdateManager.getVersionCode(getContext()));
+        String cachePath = UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext()));
         if (!TextUtils.isEmpty(cachePath)) {
             mOkView.setText("安装");
             UpdateManager.installApk(getContext(), cachePath);
@@ -184,7 +183,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        String cachePath = UpdateManager.getPreloadApk(UpdateManager.getVersionCode(getContext()));
+        String cachePath = UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext()));
         if (TextUtils.isEmpty(cachePath) && NetUtils.isWifi()) {
             if (mDownloadUtil == null) {
                 initDownload();
@@ -198,7 +197,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 public void onSuccess(String path) {
                     String cachePath = null;
                     try {
-                        cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
+                        cachePath = Uri.parse(path).buildUpon().appendQueryParameter(Constants.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -210,8 +209,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 }
             }).download(mLatestBean.pkg_url);
         }
-        if (UpdateManager.getIAnalytic() != null) {
-            UpdateManager.getIAnalytic().onAnalytic(UpdateType.NORMAL, OperationType.CANCEL);
+        if (UpdateManager.getInstance().getOnOperateListener() != null) {
+            UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NORMAL,R.id.update_cancel);
         }
     }
 
@@ -225,7 +224,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         UpdateManager.installApk(getContext(), path);
         String cachePath = null;
         try {
-            cachePath = Uri.parse(path).buildUpon().appendQueryParameter(UpdateManager.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
+            cachePath = Uri.parse(path).buildUpon().appendQueryParameter(Constants.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,7 +235,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void installPreloadApk() {
-        UpdateManager.installApk(getContext(),UpdateManager.getPreloadApk(UpdateManager.getVersionCode(getContext())));
+        UpdateManager.installApk(getContext(),UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext())));
     }
 
     @Override
