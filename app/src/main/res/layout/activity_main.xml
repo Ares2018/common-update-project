@@ -13,7 +13,7 @@
         android:id="@+id/update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="检测升级" />
+        android:text="强制升级" />
 
     <Button
         android:id="@+id/clear"
