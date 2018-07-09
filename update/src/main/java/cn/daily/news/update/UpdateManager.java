@@ -35,6 +35,7 @@ public class UpdateManager {
     private static UpdateManager sInstance = new UpdateManager();
     private OnUpdateListener mOnUpdateListener;
     private OnOperateListener mOnOperateListener;
+    private int mLayoutId = 0;
     private int mVersionCode = 0;
 
 
@@ -102,6 +103,7 @@ public class UpdateManager {
     }
 
     //TODO 当前的问题是包没有完全下载成功时也会认为是可安装包。
+
     /**
      * 获取预加载的包，防止重复下载
      *
@@ -192,5 +194,14 @@ public class UpdateManager {
 
     public synchronized void setOnOperateListener(OnOperateListener onOperateListener) {
         mOnOperateListener = onOperateListener;
+    }
+
+    public int getLayoutId() {
+        return mLayoutId;
+    }
+
+    public UpdateManager setLayoutId(int layoutId) {
+        mLayoutId = layoutId;
+        return this;
     }
 }

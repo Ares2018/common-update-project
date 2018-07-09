@@ -61,7 +61,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
+
+        int layoutId = UpdateManager.getInstance().getLayoutId();
+        if (layoutId == 0) {
+            layoutId = R.layout.fragment_update_dialog;
+        }
+
+        View rootView = inflater.inflate(layoutId, container, false);
         initUI(rootView);
         if (getArguments() != null) {
             mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
@@ -179,6 +185,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             mOkView.setText("安装");
             UpdateManager.installApk(getContext(), cachePath);
         } else {
+            mOkView.setText("更新");
             mProgressBar = new LoadingIndicatorDialog(getActivity());
             mProgressBar.setCancelable(false);
             mProgressBar.show();
