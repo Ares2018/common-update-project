@@ -30,7 +30,6 @@ import com.zjrb.core.utils.UIUtils;
 
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
@@ -46,18 +45,13 @@ import cn.daily.news.update.type.UpdateType;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate {
-    @BindView(R2.id.update_dialog_title)
-    TextView mTitleView;
-    @BindView(R2.id.update_dialog_msg)
-    TextView mMsgView;
-    @BindView(R2.id.update_dialog_cancel)
-    View mCancelView;
-    @BindView(R2.id.update_dialog_ok)
-    TextView mOkView;
-    LoadingIndicatorDialog mProgressBar;
+public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate, View.OnClickListener {
+    private TextView mTitleView;
+    private TextView mRemarkView;
+    private View mCancelView;
+    private TextView mOkView;
+    private LoadingIndicatorDialog mProgressBar;
 
-    private Unbinder mUnBinder;
     protected VersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
@@ -66,13 +60,20 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
-        mUnBinder = ButterKnife.bind(this, rootView);
-        mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        setCancelable(false);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-
+        View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
+        initUI(rootView);
+        if (getArguments() != null) {
+            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
+            if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
+                mRemarkView.setText(Html.fromHtml(getRemark()));
+            } else {
+                mRemarkView.setText("有新版本请更新!");
+            }
+            mOkView.setText(getOKText());
+            mTitleView.setText(getTitle());
+        }
+        setCancelable(false);
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
             public void onGranted(boolean isAlreadyDef) {
@@ -84,21 +85,27 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
             }
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
-
-        if (getArguments() != null) {
-            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
-            mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-            if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
-                mMsgView.setText(Html.fromHtml(getRemark()));
-            } else {
-                mMsgView.setText("有新版本请更新!");
-            }
-            mOkView.setText(getOKText());
-            mTitleView.setText(getTitle());
-        }
-
-        setCancelable(false);
         return rootView;
+    }
+
+    private void initUI(View rootView) {
+        mTitleView = rootView.findViewById(R.id.update_title);
+        mRemarkView = rootView.findViewById(R.id.update_remark);
+        mRemarkView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        mOkView = rootView.findViewById(R.id.update_ok);
+        mCancelView = rootView.findViewById(R.id.update_cancel);
+        mOkView.setOnClickListener(this);
+        mCancelView.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.update_ok) {
+            updateApk(v);
+        } else if (id == R.id.update_cancel) {
+            cancelUpdate(v);
+        }
     }
 
     protected void hideCancel() {
@@ -122,7 +129,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
 
-    @OnClick(R2.id.update_dialog_ok)
     public void updateApk(View view) {
         if (NetUtils.isWifi()) {
             downloadApk();
@@ -180,7 +186,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }
     }
 
-    @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
         String cachePath = UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext()));
@@ -210,7 +215,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             }).download(mLatestBean.pkg_url);
         }
         if (UpdateManager.getInstance().getOnOperateListener() != null) {
-            UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NORMAL,R.id.update_cancel);
+            UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NORMAL, R.id.update_cancel);
         }
     }
 
@@ -235,20 +240,19 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void installPreloadApk() {
-        UpdateManager.installApk(getContext(),UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext())));
+        UpdateManager.installApk(getContext(), UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext())));
     }
 
     @Override
     public void onFail(String err) {
         mProgressBar.dismiss();
-        mMsgView.setText("更新失败,请稍后再试");
-        mMsgView.setVisibility(View.VISIBLE);
+        mRemarkView.setText("更新失败,请稍后再试");
+        mRemarkView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnBinder.unbind();
     }
 
     @Override

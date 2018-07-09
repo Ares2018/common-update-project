@@ -2,4 +2,6 @@
 <resources>
     <item name="update_ok" type="id">update_ok</item>
     <item name="update_cancel" type="id">update_cancel</item>
+    <item name="update_title" type="id">update_title</item>
+    <item name="update_remark" type="id">update_remark</item>
 </resources>

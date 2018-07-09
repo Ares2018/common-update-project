@@ -30,7 +30,7 @@ public class UpdateTask extends APIGetTask<UpdateResponse.DataBean> {
 
     @Override
     protected String getApi() {
-        return TextUtils.isEmpty(mUrl)?DEFAULT_URL:mUrl;
+        return TextUtils.isEmpty(mUrl) ? DEFAULT_URL : mUrl;
     }
 
     private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {
