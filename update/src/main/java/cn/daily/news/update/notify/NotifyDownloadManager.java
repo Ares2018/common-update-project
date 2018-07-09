@@ -41,7 +41,7 @@ public class NotifyDownloadManager {
 
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("1", "浙江新闻", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel("1", mContext.getString(R.string.app_name), NotificationManager.IMPORTANCE_LOW);
             channel.enableLights(false);
             channel.enableVibration(false);
             channel.setShowBadge(false);
@@ -53,7 +53,7 @@ public class NotifyDownloadManager {
 
     public void startDownloadApk() {
         mBuilder.setContentTitle(UIUtils.getString(R.string.app_name));
-        mBuilder.setContentText("更新" + UIUtils.getString(R.string.app_name) + "到" + mLastVersion);
+        mBuilder.setContentText("更新" + mContext.getString(R.string.app_name) + "到" + mLastVersion);
         mBuilder.setProgress(0, 0, true);
         mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
