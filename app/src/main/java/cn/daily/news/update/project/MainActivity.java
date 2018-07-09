@@ -13,15 +13,12 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UpdateManager.getInstance().checkUpdate(MainActivity.this);
-            }
-        });
-
+        UpdateManager.getInstance().checkUpdate(this);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        UpdateManager.getInstance().cancel();
+    }
 }
