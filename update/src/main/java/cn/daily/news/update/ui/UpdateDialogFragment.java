@@ -1,6 +1,7 @@
-package cn.daily.news.update;
+package cn.daily.news.update.ui;
 
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -17,7 +18,6 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.common.permission.AbsPermSingleCallBack;
 import com.zjrb.core.common.permission.IPermissionOperate;
 import com.zjrb.core.common.permission.Permission;
@@ -30,29 +30,25 @@ import com.zjrb.core.utils.UIUtils;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-import cn.daily.news.analytics.Analytics;
+import cn.daily.news.update.Constants;
+import cn.daily.news.update.notify.NotifyDownloadManager;
+import cn.daily.news.update.R;
+import cn.daily.news.update.UpdateManager;
+import cn.daily.news.update.VersionBean;
+import cn.daily.news.update.type.UpdateType;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate {
-    @BindView(R2.id.update_dialog_title)
-    TextView mTitleView;
-    @BindView(R2.id.update_dialog_msg)
-    TextView mMsgView;
-    @BindView(R2.id.update_dialog_cancel)
-    View mCancelView;
-    @BindView(R2.id.update_dialog_ok)
-    TextView mOkView;
-    LoadingIndicatorDialog mProgressBar;
+public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate, View.OnClickListener {
+    private TextView mTitleView;
+    private TextView mRemarkView;
+    private View mCancelView;
+    private TextView mOkView;
+    private LoadingIndicatorDialog mProgressBar;
 
-    private Unbinder mUnBinder;
-    protected ResourceBiz.LatestVersionBean mLatestBean;
+    protected VersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
 
@@ -60,14 +56,26 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
-        mUnBinder = ButterKnife.bind(this, rootView);
-        mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        setCancelable(false);
-
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        int layoutId = UpdateManager.getInstance().getLayoutId();
+        if (layoutId == 0) {
+            layoutId = R.layout.fragment_update_dialog;
+        }
 
+        View rootView = inflater.inflate(layoutId, container, false);
+        initUI(rootView);
+        if (getArguments() != null) {
+            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
+            if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
+                mRemarkView.setText(Html.fromHtml(getRemark()));
+            } else {
+                mRemarkView.setText("有新版本请更新!");
+            }
+            mOkView.setText(getOKText());
+            mTitleView.setText(getTitle());
+        }
+        setCancelable(false);
         PermissionManager.get().request(this, new AbsPermSingleCallBack() {
             @Override
             public void onGranted(boolean isAlreadyDef) {
@@ -79,21 +87,27 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
             }
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
-
-        if (getArguments() != null) {
-            mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
-            mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-            if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
-                mMsgView.setText(Html.fromHtml(getRemark()));
-            } else {
-                mMsgView.setText("有新版本请更新!");
-            }
-            mOkView.setText(getOKText());
-            mTitleView.setText(getTitle());
-        }
-
-        setCancelable(false);
         return rootView;
+    }
+
+    private void initUI(View rootView) {
+        mTitleView = rootView.findViewById(R.id.update_title);
+        mRemarkView = rootView.findViewById(R.id.update_remark);
+        mRemarkView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        mOkView = rootView.findViewById(R.id.update_ok);
+        mCancelView = rootView.findViewById(R.id.update_cancel);
+        mOkView.setOnClickListener(this);
+        mCancelView.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.update_ok) {
+            updateApk(v);
+        } else if (id == R.id.update_cancel) {
+            cancelUpdate(v);
+        }
     }
 
     protected void hideCancel() {
@@ -117,24 +131,20 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
 
-    @OnClick(R2.id.update_dialog_ok)
     public void updateApk(View view) {
         if (NetUtils.isWifi()) {
             downloadApk();
+            if (UpdateManager.getInstance().getOnOperateListener() != null) {
+                UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NORMAL, R.id.update_ok);
+            }
         } else {
             dismissAllowingStateLoss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
-            args.putSerializable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
+            args.putSerializable(Constants.Key.UPDATE_INFO, mLatestBean);
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
         }
-
-        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011")
-                .setEvenName("引导老版本用户升级安装点击")
-                .setPageType("引导页")
-                .build()
-                .send();
     }
 
 
@@ -147,7 +157,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 if (mDownloadUtil == null) {
                     initDownload();
                 }
-                new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
+                new NotifyDownloadManager(getContext(), mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url, mLatestBean.version_code).startDownloadApk();
             }
 
             @Override
@@ -166,20 +176,23 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     protected void forceDownloadApk() {
-        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
+        String cachePath = UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext()));
+        if (!TextUtils.isEmpty(cachePath)) {
             mOkView.setText("安装");
-            UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+            UpdateManager.installApk(getContext(), cachePath);
         } else {
+            mOkView.setText("更新");
             mProgressBar = new LoadingIndicatorDialog(getActivity());
+            mProgressBar.setCancelable(false);
             mProgressBar.show();
             DownloadUtil.get().setListener(this).download(mLatestBean.pkg_url);
         }
     }
 
-    @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
+        String cachePath = UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext()));
+        if (TextUtils.isEmpty(cachePath) && NetUtils.isWifi()) {
             if (mDownloadUtil == null) {
                 initDownload();
             }
@@ -190,7 +203,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                 @Override
                 public void onSuccess(String path) {
-                    SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+                    String cachePath = null;
+                    try {
+                        cachePath = Uri.parse(path).buildUpon().appendQueryParameter(Constants.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    SettingManager.getInstance().setApkCachePath(cachePath);
                 }
 
                 @Override
@@ -198,12 +217,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 }
             }).download(mLatestBean.pkg_url);
         }
-
-        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012")
-                .setEvenName("升级弹框取消按钮点击")
-                .setPageType("引导页")
-                .build()
-                .send();
+        if (UpdateManager.getInstance().getOnOperateListener() != null) {
+            UpdateManager.getInstance().getOnOperateListener().onOperate(UpdateType.NORMAL, R.id.update_cancel);
+        }
     }
 
     @Override
@@ -214,27 +230,32 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Override
     public void onSuccess(String path) {
         UpdateManager.installApk(getContext(), path);
-        SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+        String cachePath = null;
+        try {
+            cachePath = Uri.parse(path).buildUpon().appendQueryParameter(Constants.Key.APK_VERSION_CODE, String.valueOf(mLatestBean.version_code)).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SettingManager.getInstance().setApkCachePath(cachePath);
         mProgressBar.dismiss();
         mOkView.setEnabled(true);
         mOkView.setText("安装");
     }
 
     protected void installPreloadApk() {
-        UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+        UpdateManager.installApk(getContext(), UpdateManager.getInstance().getPreloadApk(UpdateManager.getInstance().getVersionCode(getContext())));
     }
 
     @Override
     public void onFail(String err) {
         mProgressBar.dismiss();
-        mMsgView.setText("更新失败,请稍后再试");
-        mMsgView.setVisibility(View.VISIBLE);
+        mRemarkView.setText("更新失败,请稍后再试");
+        mRemarkView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnBinder.unbind();
     }
 
     @Override

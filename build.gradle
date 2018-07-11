@@ -10,11 +10,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.jakewharton:butterknife-gradle-plugin:8.6.0'
-
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
     }
 }
 
@@ -22,7 +17,6 @@ allprojects {
     repositories {
         jcenter()
         maven { url "http://10.100.62.98:8086/nexus/content/groups/public" }
-        maven { url 'http://pre.haier.com/nexus/content/repositories/qdmobile-release/' }
         maven {
             url 'https://maven.google.com/'
             name 'Google'

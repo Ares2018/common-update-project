@@ -3,6 +3,7 @@ package cn.daily.news.update;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,136 +12,135 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
-import com.zjrb.core.api.base.APIGetTask;
-import com.zjrb.core.api.callback.APICallBack;
-import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.common.manager.APICallManager;
-import com.zjrb.core.db.SPHelper;
 import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
+
+import cn.daily.news.update.listener.OnOperateListener;
+import cn.daily.news.update.listener.OnUpdateListener;
+import cn.daily.news.update.task.UpdateTask;
+import cn.daily.news.update.ui.ForceUpdateDialog;
+import cn.daily.news.update.ui.PreloadUpdateDialog;
+import cn.daily.news.update.ui.UpdateDialogFragment;
 
 /**
  * Created by lixinke on 2017/8/30.
  */
 
 public class UpdateManager {
-    public static String TAG_TASK = "tag_task_update_manager";
+    private static String TAG_TASK = "tag_task_update";
+    private static String MIME_APK = "application/vnd.android.package-archive";
 
-    interface Key {
-        String UPDATE_INFO = "update_info";
-        String VERSION_CODE = "version_code";
-        String SCHEME = "scheme";
-        String APK_URL = "download_apk_url";
-        String APK_PATH = "download_apk_local_path";
-        String APK_VERSION = "download_apk_version";
+    private static UpdateManager sInstance = new UpdateManager();
+    private OnUpdateListener mOnUpdateListener;
+    private OnOperateListener mOnOperateListener;
+    private int mLayoutId = 0;
+    private int mVersionCode = 0;
+
+
+    public static UpdateManager getInstance() {
+        return sInstance;
     }
 
-    interface Action {
-        String DOWNLOAD_COMPLETE = "download_complete";
-        String DOWNLOAD_RETRY = "download_retry";
+    /**
+     * 检测更新，浙江新闻使用
+     *
+     * @param activity
+     */
+    public void checkUpdate(AppCompatActivity activity) {
+        UpdateTask.createTask(activity, null, TAG_TASK);
     }
 
-    public interface UpdateListener {
-        void onUpdate(UpdateResponse.DataBean dataBean);
-
-        void onError(String errMsg, int errCode);
-    }
-
-    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
-        checkData(latest_version, appCompatActivity, null);
-    }
-
-    public static void checkUpdate(final AppCompatActivity activity, final UpdateListener listener) {
-        new APIGetTask<UpdateResponse.DataBean>(new CheckUpdateCallBack(listener, activity)) {
-            @Override
-            protected void onSetupParams(Object... params) {
-            }
-
-            @Override
-            protected String getApi() {
-                return "/api/app_version/detail";
-            }
-        }.setTag(TAG_TASK).exe();
-    }
-
-    public static void cancel() {
+    /**
+     * 取消网络请求
+     */
+    public void cancel() {
         APICallManager.get().cancel(TAG_TASK);
     }
 
-    private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
-        int versionCode = 0;
-        try {
-            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-            if (packageInfo != null) {
-                versionCode = packageInfo.versionCode;
-            }
-        } catch (Exception e) {
-            Log.e("Update", "get version code error", e);
-        }
+    /**
+     * 对外检测更新
+     *
+     * @param activity
+     * @param bean
+     */
+    public void checkUpdate(AppCompatActivity activity, VersionBean bean) {
+        checkData(activity, bean);
+    }
 
-        if (versionCode < latest.version_code) {
-            latest.isNeedUpdate = true;
+
+    /**
+     * 根据VersionBean显示不同的更新提示框
+     *
+     * @param activity
+     * @param versionBean
+     */
+    private void checkData(AppCompatActivity activity, VersionBean versionBean) {
+        if (getVersionCode(activity) < versionBean.version_code) {
             UpdateDialogFragment updateDialogFragment;
-            if (latest.force_upgraded) {
+            if (versionBean.force_upgraded) {
                 updateDialogFragment = new ForceUpdateDialog();
             } else {
-                if (isHasPreloadApk(latest.pkg_url)) {
-                    latest.preloadPath = SettingManager.getInstance().getApkPath(latest.pkg_url);
+                String cachePath = getPreloadApk(getVersionCode(activity));
+                if (!TextUtils.isEmpty(cachePath)) {
                     updateDialogFragment = new PreloadUpdateDialog();
                 } else {
                     updateDialogFragment = new UpdateDialogFragment();
                 }
             }
             Bundle args = new Bundle();
-            args.putSerializable(Key.UPDATE_INFO, latest);
+            args.putSerializable(Constants.Key.UPDATE_INFO, versionBean);
             updateDialogFragment.setArguments(args);
             updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
         }
 
-        if (listener != null) {
+        if (mOnUpdateListener != null) {
             UpdateResponse.DataBean dataBean = new UpdateResponse.DataBean();
-            dataBean.latest = latest;
-            listener.onUpdate(dataBean);
+            dataBean.latest = versionBean;
+            mOnUpdateListener.onUpdate(dataBean);
         }
     }
 
-    public static String getPreloadApkPath() {
-        String result = "";
-        ResourceBiz biz = SPHelper.get().getObject(SPHelper.Key.INITIALIZATION_RESOURCES);
-        if (biz != null && biz.latest_version != null && !TextUtils.isEmpty(biz.latest_version.pkg_url)) {
-            String url = biz.latest_version.pkg_url;
-            if (isHasPreloadApk(url)) {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("path", SettingManager.getInstance().getApkPath(url));
-                jsonObject.addProperty("version", biz.latest_version.version_code);
-                return jsonObject.toString();
-            }
-        }
-        return result;
-    }
+    //TODO 当前的问题是包没有完全下载成功时也会认为是可安装包。
 
-    public static boolean isHasPreloadApk(String pkg_url) {
+    /**
+     * 获取预加载的包，防止重复下载
+     *
+     * @param versionCode
+     * @return
+     */
+    public String getPreloadApk(int versionCode) {
         try {
-            String path = SettingManager.getInstance().getApkPath(pkg_url);
+            String path = SettingManager.getInstance().getApkCachePath();
             if (!TextUtils.isEmpty(path)) {
+                Uri uri = Uri.parse(path);
+                String code = uri.getQueryParameter(Constants.Key.APK_VERSION_CODE);
+                if (Integer.parseInt(code) < versionCode) {
+                    return null;
+                }
+                path = uri.getPath();
                 File file = new File(path);
                 if (file.exists()) {
-                    return true;
+                    return file.getAbsolutePath();
                 }
             }
-            return false;
+            return null;
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 
-    private static String MIME_APK = "application/vnd.android.package-archive";
 
+    /**
+     * 下载完成后后安装APK命令
+     *
+     * @param context
+     * @param path
+     */
     public static void installApk(Context context, String path) {
         File file = new File(path);
-        if (file!=null && file.exists()) {
+        if (file != null && file.exists()) {
             Intent install = new Intent(Intent.ACTION_VIEW);
             install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             //兼容7.0私有文件权限
@@ -155,48 +155,53 @@ public class UpdateManager {
         }
     }
 
-    public static String getApkKey(String url, String version) {
+    /**
+     * 获取当前应用的版本号
+     *
+     * @param context
+     * @return
+     */
+    public int getVersionCode(Context context) {
+        if (context == null) {
+            return 0;
+        }
+        if (mVersionCode > 0) {
+            return mVersionCode;
+        }
         try {
-            if (!TextUtils.isEmpty(url)) {
-                Uri uri = Uri.parse(url);
-                String scheme = uri.getScheme();
-                return uri.buildUpon().appendQueryParameter(Key.VERSION_CODE, version).appendQueryParameter(Key.SCHEME, scheme).build().toString();
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
+            if (packageInfo != null) {
+                mVersionCode = packageInfo.versionCode;
             }
         } catch (Exception e) {
+            Log.e("Update", "get version code error", e);
         }
-        return url;
+        return mVersionCode;
     }
 
-    private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {
-        private final UpdateListener mListener;
-        private final AppCompatActivity mActivity;
 
-        public CheckUpdateCallBack(UpdateListener listener, AppCompatActivity activity) {
-            mListener = listener;
-            mActivity = activity;
-        }
+    public synchronized OnUpdateListener getOnUpdateListener() {
+        return mOnUpdateListener;
+    }
 
-        @Override
-        public void onSuccess(UpdateResponse.DataBean data) {
-            if (data == null || data.latest == null) {
-                if (mListener != null) {
-                    mListener.onError("检测更新失败!", -1);
-                    if (BuildConfig.DEBUG) {
-                        Log.e("update", "服务端返回错误!");
-                    }
-                }
-                return;
-            }
-            data.latest.pkg_url = getApkKey(data.latest.pkg_url, String.valueOf(data.latest.version_code));
-            checkData(data.latest, mActivity, mListener);
-        }
+    public synchronized OnOperateListener getOnOperateListener() {
+        return mOnOperateListener;
+    }
 
-        @Override
-        public void onError(String errMsg, int errCode) {
-            super.onError(errMsg, errCode);
-            if (mListener != null) {
-                mListener.onError(errMsg, errCode);
-            }
-        }
+    public synchronized void setOnUpdateListener(OnUpdateListener onUpdateListener) {
+        mOnUpdateListener = onUpdateListener;
+    }
+
+    public synchronized void setOnOperateListener(OnOperateListener onOperateListener) {
+        mOnOperateListener = onOperateListener;
+    }
+
+    public int getLayoutId() {
+        return mLayoutId;
+    }
+
+    public UpdateManager setLayoutId(int layoutId) {
+        mLayoutId = layoutId;
+        return this;
     }
 }

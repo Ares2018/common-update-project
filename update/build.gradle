@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jakewharton.butterknife'
 apply from: 'http://10.100.62.98:8086/nexus/service/local/artifact/maven/redirect?r=releases&g=cn.daily.android&a=publish&e=gradle&v=0.0.4'
 
 
@@ -26,18 +25,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'cn.daily.android:core-library:5.2.1.6-SNAPSHOT'
-    compile 'cn.daily.android:analytics:5.0.3.2-SNAPSHOT'
-
+//    compile project(":core-library")
+    compile ('cn.daily.android:core-library:5.3.2.5-SNAPSHOT'){
+        exclude group:"cn.daily.android",module:"analytics"
+    }
+    //noinspection GradleCompatible
     compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:support-v4:26.1.0'
-    compile 'com.jakewharton:butterknife:8.6.0'
-    testCompile 'junit:junit:4.12'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
-//    compile project(':core-library')
 }
