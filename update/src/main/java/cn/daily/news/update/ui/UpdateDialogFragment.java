@@ -30,13 +30,9 @@ import com.zjrb.core.utils.UIUtils;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.notify.NotifyDownloadManager;
 import cn.daily.news.update.R;
-import cn.daily.news.update.R2;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.VersionBean;
 import cn.daily.news.update.type.UpdateType;

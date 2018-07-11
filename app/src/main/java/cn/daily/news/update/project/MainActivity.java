@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             bean.version_code = 50003;
             bean.version="5.0.3";
             bean.remark = "<div>1.新增直播预告功能，精彩直播不容错过<br>2.视频支持重力感应横竖屏切换，体验更流畅<br>3.详情页加载速度优化，缩短加载时间<br>4.修复bug，提升稳定性</div>";
-            UpdateManager.getInstance().setLayoutId(0).checkUpdate(this, bean);
+            UpdateManager.getInstance().checkUpdate(this, bean);
         } else if (id == R.id.clear) {
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), getString(R.string.app_name) + ".apk");
             if (file != null && file.exists()) {
