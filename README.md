@@ -20,8 +20,6 @@
 	```
 	compile 'cn.daily.android:core-library:5.3.2.2-SNAPSHOT'    
 	compile 'com.android.support:appcompat-v7:26.1.0'
-	compile 'com.jakewharton:butterknife:8.6.0'
-	annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 	```
 	
 	
@@ -35,10 +33,10 @@
 	}
 	```
 	
-	项目build.gradle添加依赖依赖
+	项目build.gradle添加依赖依赖 [最新版本](http://10.100.62.98:8086/nexus/#nexus-search;gav~cn.daily.android~update~~~~kw,versionexpand)
 	
 	```
-	compile 'cn.daily.android:update:5.3.1.11-SNAPSHOT'
+	compile 'cn.daily.android:update:5.3.1.12-SNAPSHOT'
 	```
 	
 
@@ -69,7 +67,7 @@
 	}
 	```
 
-2. 调用方法进行检测
+2. 调用方法进行检测`UpdateManager.getInstance().checkUpdate(activity, bean);`
 
 	```
 	  /**
@@ -77,20 +75,28 @@
 	     * @param appCompatActivity 获取getSupportFragmentManager
 	     * @param latest_version 检测更新数据结构
 	     */
-	    public static void checkUpdate(AppCompatActivity activity, VersionBean versionBean){};
+	     public void checkUpdate(AppCompatActivity activity, VersionBean bean){};
 	```
-3. 添加埋点接口
+3. 按钮点击事件监听
 
 	```
 	/**
-	 * 检测更新数据采集接口
+	 * 检测更新操作符监听
 	 */
-	public interface IAnalytic {
+	public interface OnOperateListener {
 	    /**
-	     * 点击更新或者取消时此方法会被调用
-	     * @param updateType { NORMAL//正常更新,FORCE//强制更新,NON_WIFI//移动网络更新}
-	     * @param operationType { UPDATE//更新按钮,CANCEL//取消按钮}
+	     * 检测更新按钮操作符
+	     *
+	     * @param type 更新类型 {@link UpdateType#NON_WIFI,UpdateType#NORMAL,UpdateType#FORCE}
+	     * @param id   按钮ID{update_ok,update_cancel}
 	     */
-	    void onAnalytic(UpdateType updateType, OperationType operationType);
+	    void onOperate(UpdateType type, int id);
 	}
 	```
+	
+4. 定制UI
+
+	检测更新保留 更新(@id/update_ok)、取消(@id/update_cancel)和名称(@id/update_title)三个按钮，其余部分可以自行定制
+	`        UpdateManager.getInstance().setLayoutId(R.layout.custom_update_layout).checkUpdate(activity, bean);
+`
+	
