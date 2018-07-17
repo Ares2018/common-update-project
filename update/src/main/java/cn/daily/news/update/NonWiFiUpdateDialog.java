@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import cn.daily.news.analytics.Analytics;
 
 /**
@@ -35,9 +38,17 @@ public class NonWiFiUpdateDialog extends UpdateDialogFragment {
     @Override
     public void updateApk(View view) {
         downloadApk();
-        new Analytics.AnalyticsBuilder(getContext(),"100011","100011")
+        JSONObject properties=new JSONObject();
+        try {
+            properties.put("pageType","引导页");
+            properties.put("clickTabName","取消升级");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        new Analytics.AnalyticsBuilder(getContext(),"100011","100011","appTabClick",false)
                 .setEvenName("引导老版本用户升级安装点击")
                 .setPageType("引导页")
+                .setProperties(properties)
                 .build()
                 .send();
     }
