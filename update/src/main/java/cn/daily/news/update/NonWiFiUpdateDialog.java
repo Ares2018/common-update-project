@@ -35,9 +35,11 @@ public class NonWiFiUpdateDialog extends UpdateDialogFragment {
     @Override
     public void updateApk(View view) {
         downloadApk();
-        new Analytics.AnalyticsBuilder(getContext(),"100011","100011")
+        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011","appTabClick",false)
                 .setEvenName("引导老版本用户升级安装点击")
                 .setPageType("引导页")
+                .pageType("引导页")
+                .clickTabName("升级")
                 .build()
                 .send();
     }

@@ -55,6 +55,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     protected ResourceBiz.LatestVersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
+    private Analytics mAnalytics;
 
 
     @Nullable
@@ -93,6 +94,10 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }
 
         setCancelable(false);
+
+        mAnalytics = new Analytics.AnalyticsBuilder(getContext(), "A0010", "A0010", "guidePageStay", true)
+                .pageType("引导页")
+                .build();
         return rootView;
     }
 
@@ -130,9 +135,11 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dialog.show(getFragmentManager(), "updateDialog");
         }
 
-        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011")
+        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011", "appTabClick", false)
                 .setEvenName("引导老版本用户升级安装点击")
                 .setPageType("引导页")
+                .pageType("引导页")
+                .clickTabName("升级")
                 .build()
                 .send();
     }
@@ -199,9 +206,11 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             }).download(mLatestBean.pkg_url);
         }
 
-        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012")
+        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012", "appTabClick", false)
                 .setEvenName("升级弹框取消按钮点击")
                 .setPageType("引导页")
+                .pageType("引导页")
+                .clickTabName("取消升级")
                 .build()
                 .send();
     }
@@ -235,6 +244,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     public void onDestroyView() {
         super.onDestroyView();
         mUnBinder.unbind();
+        if (mAnalytics != null) {
+            mAnalytics.sendWithDuration();
+        }
     }
 
     @Override
