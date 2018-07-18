@@ -31,7 +31,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'cn.daily.android:core-library:5.2.1.6-SNAPSHOT'
-    compile 'cn.daily.android:analytics:5.4.0.1-SNAPSHOT'
+    compile 'cn.daily.android:analytics:5.0.3.2-SNAPSHOT'
 
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

@@ -28,9 +28,6 @@ import com.zjrb.core.utils.NetUtils;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.List;
 
 import butterknife.BindView;
@@ -133,17 +130,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dialog.show(getFragmentManager(), "updateDialog");
         }
 
-        JSONObject properties=new JSONObject();
-        try {
-            properties.put("pageType","引导页");
-            properties.put("clickTabName","升级");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011","appTabClick",false)
+        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011")
                 .setEvenName("引导老版本用户升级安装点击")
                 .setPageType("引导页")
-                .setProperties(properties)
                 .build()
                 .send();
     }
@@ -210,17 +199,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             }).download(mLatestBean.pkg_url);
         }
 
-        JSONObject properties=new JSONObject();
-        try {
-            properties.put("pageType","引导页");
-            properties.put("clickTabName","取消升级");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012","appTabClick",false)
+        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012")
                 .setEvenName("升级弹框取消按钮点击")
                 .setPageType("引导页")
-                .setProperties(properties)
                 .build()
                 .send();
     }
