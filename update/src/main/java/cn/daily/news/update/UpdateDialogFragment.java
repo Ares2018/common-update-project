@@ -95,7 +95,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
         setCancelable(false);
 
-        mAnalytics = new Analytics.AnalyticsBuilder(getContext(), "A0010", "A0010", "guidePageStay", true)
+        mAnalytics = new Analytics.AnalyticsBuilder(getContext(), "A0010", "A0010", "GuidePageStay", true)
                 .pageType("引导页")
                 .build();
         return rootView;
@@ -135,7 +135,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dialog.show(getFragmentManager(), "updateDialog");
         }
 
-        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011", "appTabClick", false)
+        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011", "AppTabClick", false)
                 .setEvenName("引导老版本用户升级安装点击")
                 .setPageType("引导页")
                 .pageType("引导页")
@@ -206,7 +206,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             }).download(mLatestBean.pkg_url);
         }
 
-        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012", "appTabClick", false)
+        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012", "AppTabClick", false)
                 .setEvenName("升级弹框取消按钮点击")
                 .setPageType("引导页")
                 .pageType("引导页")
