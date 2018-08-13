@@ -95,7 +95,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
         setCancelable(false);
 
-        mAnalytics = new Analytics.AnalyticsBuilder(getContext(), "A0010", "A0010", "GuidePageStay", true)
+        mAnalytics = new Analytics.AnalyticsBuilder(getContext(), "A0010", "100025", "GuidePageStay", true)
+                .setPageType("引导页")
+                .setEvenName("引导页停留时长")
                 .pageType("引导页")
                 .build();
         return rootView;
