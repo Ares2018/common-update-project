@@ -55,7 +55,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     protected ResourceBiz.LatestVersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
-    private Analytics mAnalytics;
 
 
     @Nullable
@@ -95,11 +94,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
         setCancelable(false);
 
-        mAnalytics = new Analytics.AnalyticsBuilder(getContext(), "A0010", "100025", "GuidePageStay", true)
-                .setPageType("引导页")
-                .setEvenName("引导页停留时长")
-                .pageType("引导页")
-                .build();
+
         return rootView;
     }
 
@@ -246,9 +241,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     public void onDestroyView() {
         super.onDestroyView();
         mUnBinder.unbind();
-        if (mAnalytics != null) {
-            mAnalytics.sendWithDuration();
-        }
     }
 
     @Override
