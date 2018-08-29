@@ -80,7 +80,7 @@ public class UpdateManager {
             Log.e("Update", "get version code error", e);
         }
 
-        if (VersionCompareUtils.compareVersionName(versionName,latest.version)==1) {
+        if (VersionCompareUtils.compareVersionName(versionName,latest.version)==-1) {
             latest.isNeedUpdate = true;
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
