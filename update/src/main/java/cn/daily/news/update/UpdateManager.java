@@ -70,17 +70,17 @@ public class UpdateManager {
     }
 
     private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
-        int versionCode = 0;
+        String versionName="5.0";
         try {
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
             if (packageInfo != null) {
-                versionCode = packageInfo.versionCode;
+                versionName = packageInfo.versionName;
             }
         } catch (Exception e) {
             Log.e("Update", "get version code error", e);
         }
 
-        if (versionCode < latest.version_code) {
+        if (VersionCompareUtils.compareVersionName(versionName,latest.version)==1) {
             latest.isNeedUpdate = true;
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
