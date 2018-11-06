@@ -1,4 +1,0 @@
-<resources>
-    <attr name="update_divider_color" format="reference" />
-    <attr name="update_background" format="reference"/>
-</resources>

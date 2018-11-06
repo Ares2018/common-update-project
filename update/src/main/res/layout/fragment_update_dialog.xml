@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:adjustViewBounds="true"
-    android:background="?attr/update_background"
+    android:background="@drawable/update_background"
     android:gravity="center"
-    android:maxHeight="700dp"
     android:maxWidth="600dp"
-    android:minHeight="200dp"
+    android:maxHeight="700dp"
     android:minWidth="300dp"
+    android:minHeight="200dp"
     android:orientation="vertical">
 
     <TextView
@@ -18,13 +18,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
         android:layout_marginLeft="60dp"
-        android:layout_marginRight="60dp"
-        android:gravity="center"
         android:layout_marginTop="40dp"
+        android:layout_marginRight="60dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
         android:text="更新提示"
-        android:textColor="?attr/tc_484848"
+        android:textColor="@color/_484848_7a7b7d"
         android:textSize="16sp" />
 
     <FrameLayout
@@ -33,9 +33,9 @@
         android:layout_above="@+id/divider"
         android:layout_below="@+id/update_dialog_title"
         android:layout_centerVertical="true"
-        android:layout_weight="1"
         android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp">
+        android:layout_marginRight="30dp"
+        android:layout_weight="1">
 
         <ProgressBar
             android:id="@+id/update_dialog_progressBar"
@@ -43,19 +43,19 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone" />
-            <TextView
-                android:adjustViewBounds="true"
-                android:id="@+id/update_dialog_msg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:maxHeight="500dp"
-                android:minHeight="200dp"
-                android:scrollbars="vertical"
-                android:text="v5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\n"
-                android:textColor="?attr/tc_484848"
-                android:textSize="14sp"
-                />
+
+        <TextView
+            android:id="@+id/update_dialog_msg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:gravity="center_vertical"
+            android:maxHeight="500dp"
+            android:minHeight="200dp"
+            android:scrollbars="vertical"
+            android:text="v5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\nv5.0.0版本全新亮相\n"
+            android:textColor="@color/_484848_7a7b7d"
+            android:textSize="14sp" />
     </FrameLayout>
 
     <View
@@ -63,7 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_above="@+id/bottom_container"
-        android:background="?attr/update_divider_color" />
+        android:background="@color/update_divider_color" />
 
     <LinearLayout
         android:id="@+id/bottom_container"
@@ -83,32 +83,30 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="13dp"
-                android:paddingTop="13dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
                 android:text="取消"
-                android:textColor="?attr/tc_484848"
+                android:textColor="@color/_484848_7a7b7d"
                 android:textSize="14sp" />
 
             <View
                 android:layout_width="0.5dp"
                 android:layout_height="match_parent"
-                android:background="?attr/update_divider_color" />
-
+                android:background="@color/update_divider_color" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/update_dialog_ok"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="13dp"
-            android:paddingTop="13dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:paddingTop="13dp"
+            android:paddingBottom="13dp"
             android:text="确定"
-            android:textColor="?tc_f44b50"
+            android:textColor="@color/_f44b50_8e3636"
             android:textSize="14sp" />
     </LinearLayout>
-
 </LinearLayout>

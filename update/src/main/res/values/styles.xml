@@ -1,12 +1,8 @@
 <resources>
 
     <style name="UpdateTheme" parent="CoreTheme.Base">
-        <item name="update_divider_color">@color/update_divider_color</item>
-        <item name="update_background">@drawable/update_background</item>
     </style>
 
     <style name="UpdateThemeNight" parent="CoreThemeNight.Base">
-        <item name="update_divider_color">@color/update_divider_color_night</item>
-        <item name="update_background">@drawable/update_background_night</item>
     </style>
 </resources>
