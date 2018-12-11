@@ -9,6 +9,8 @@ import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
 
+import java.io.File;
+
 /**
  * Created by lixinke on 2017/10/23.
  */
@@ -25,11 +27,17 @@ public class UpdateReceiver extends BroadcastReceiver {
             UpdateManager.installApk(context, path);
         } else if (UpdateManager.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
             String url = intent.getStringExtra(UpdateManager.Key.APK_URL);
-            String version=intent.getStringExtra(UpdateManager.Key.APK_VERSION);
+            String version = intent.getStringExtra(UpdateManager.Key.APK_VERSION);
+
+            File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
             mDownloadUtil = DownloadUtil.get()
-                    .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
+                    .setDir(folder.getPath())
                     .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
-            new NotifyDownloadManager(mDownloadUtil,version,url).startDownloadApk();
+            new NotifyDownloadManager(mDownloadUtil, version, url).startDownloadApk();
         }
     }
 }

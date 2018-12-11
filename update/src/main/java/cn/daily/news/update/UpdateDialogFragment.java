@@ -28,6 +28,7 @@ import com.zjrb.core.utils.NetUtils;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -164,8 +165,14 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
     private void initDownload() {
+
+        File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
         mDownloadUtil = DownloadUtil.get()
-                .setDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath())
+                .setDir(folder.getPath())
                 .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
     }
 
