@@ -63,7 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_above="@+id/bottom_container"
-        android:background="@color/update_divider_color" />
+        android:background="@color/_979797_7a7b7d" />
 
     <LinearLayout
         android:id="@+id/bottom_container"
@@ -94,7 +94,7 @@
             <View
                 android:layout_width="0.5dp"
                 android:layout_height="match_parent"
-                android:background="@color/update_divider_color" />
+                android:background="@color/_979797_7a7b7d" />
         </LinearLayout>
 
         <TextView
