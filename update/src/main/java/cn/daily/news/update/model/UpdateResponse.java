@@ -1,6 +1,4 @@
-package cn.daily.news.update;
-
-import com.zjrb.core.common.biz.ResourceBiz;
+package cn.daily.news.update.model;
 
 /**
  * Created by lixinke on 2017/8/31.

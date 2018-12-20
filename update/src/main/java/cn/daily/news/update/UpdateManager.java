@@ -21,6 +21,13 @@ import com.zjrb.core.utils.SettingManager;
 
 import java.io.File;
 
+import cn.daily.news.update.model.UpdateResponse;
+import cn.daily.news.update.model.VersionBean;
+import cn.daily.news.update.ui.ForceUpdateDialog;
+import cn.daily.news.update.ui.PreloadUpdateDialog;
+import cn.daily.news.update.ui.UpdateDialogFragment;
+import cn.daily.news.update.util.VersionCompareUtils;
+
 /**
  * Created by lixinke on 2017/8/30.
  */

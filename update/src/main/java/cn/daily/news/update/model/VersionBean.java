@@ -1,4 +1,4 @@
-package cn.daily.news.update;
+package cn.daily.news.update.model;
 
 import java.io.Serializable;
 

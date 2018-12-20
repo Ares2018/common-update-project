@@ -1,4 +1,4 @@
-package cn.daily.news.update;
+package cn.daily.news.update.ui;
 
 
 import android.os.Bundle;
@@ -34,7 +34,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import cn.daily.news.analytics.Analytics;
+import cn.daily.news.update.Constants;
+import cn.daily.news.update.NotifyDownloadManager;
+import cn.daily.news.update.R;
+import cn.daily.news.update.R2;
+import cn.daily.news.update.UpdateManager;
+import cn.daily.news.update.model.VersionBean;
+import cn.daily.news.update.util.AnalyticUtil;
 
 
 /**
