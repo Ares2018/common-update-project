@@ -131,14 +131,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
         }
-
-        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011", "AppTabClick", false)
-                .setEvenName("引导老版本用户升级安装点击")
-                .setPageType("引导页")
-                .pageType("引导页")
-                .clickTabName("升级")
-                .build()
-                .send();
+        AnalyticUtil.ok(getContext());
     }
 
 
@@ -208,14 +201,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 }
             }).download(mLatestBean.pkg_url);
         }
-
-        new Analytics.AnalyticsBuilder(getContext(), "100012", "100012", "AppTabClick", false)
-                .setEvenName("升级弹框取消按钮点击")
-                .setPageType("引导页")
-                .pageType("引导页")
-                .clickTabName("取消升级")
-                .build()
-                .send();
+        AnalyticUtil.cancel(getContext());
     }
 
     @Override

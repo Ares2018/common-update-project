@@ -25,13 +25,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment {
     @Override
     public void updateApk(View view) {
         forceDownloadApk();
-        new Analytics.AnalyticsBuilder(getContext(), "100011", "100011","AppTabClick",false)
-                .setEvenName("引导老版本用户升级安装点击")
-                .setPageType("引导页")
-                .pageType("引导页")
-                .clickTabName("升级")
-                .build()
-                .send();
+        AnalyticUtil.ok(getContext());
     }
 
     @Override
