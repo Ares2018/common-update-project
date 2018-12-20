@@ -53,7 +53,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     LoadingIndicatorDialog mProgressBar;
 
     private Unbinder mUnBinder;
-    protected ResourceBiz.LatestVersionBean mLatestBean;
+    protected VersionBean mLatestBean;
 
     private DownloadUtil mDownloadUtil;
 
@@ -82,7 +82,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
         if (getArguments() != null) {
-            mLatestBean = (ResourceBiz.LatestVersionBean) getArguments().getSerializable(UpdateManager.Key.UPDATE_INFO);
+            mLatestBean = (VersionBean) getArguments().getSerializable(Constant.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
             if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
@@ -128,7 +128,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dismissAllowingStateLoss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
-            args.putSerializable(UpdateManager.Key.UPDATE_INFO, mLatestBean);
+            args.putSerializable(Constant.Key.UPDATE_INFO, mLatestBean);
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
         }

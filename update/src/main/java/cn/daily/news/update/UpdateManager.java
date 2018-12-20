@@ -28,27 +28,13 @@ import java.io.File;
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
 
-    interface Key {
-        String UPDATE_INFO = "update_info";
-        String VERSION_CODE = "version_code";
-        String SCHEME = "scheme";
-        String APK_URL = "download_apk_url";
-        String APK_PATH = "download_apk_local_path";
-        String APK_VERSION = "download_apk_version";
-    }
-
-    interface Action {
-        String DOWNLOAD_COMPLETE = "download_complete";
-        String DOWNLOAD_RETRY = "download_retry";
-    }
-
     public interface UpdateListener {
         void onUpdate(UpdateResponse.DataBean dataBean);
 
         void onError(String errMsg, int errCode);
     }
 
-    public static void checkUpdate(AppCompatActivity appCompatActivity, ResourceBiz.LatestVersionBean latest_version) {
+    public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
         checkData(latest_version, appCompatActivity, null);
     }
 
@@ -65,11 +51,8 @@ public class UpdateManager {
         }.setTag(TAG_TASK).exe();
     }
 
-    public static void cancel() {
-        APICallManager.get().cancel(TAG_TASK);
-    }
 
-    private static void checkData(ResourceBiz.LatestVersionBean latest, AppCompatActivity activity, UpdateListener listener) {
+    private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
         String versionName="5.0";
         try {
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
@@ -94,7 +77,7 @@ public class UpdateManager {
                 }
             }
             Bundle args = new Bundle();
-            args.putSerializable(Key.UPDATE_INFO, latest);
+            args.putSerializable(Constant.Key.UPDATE_INFO, latest);
             updateDialogFragment.setArguments(args);
             updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
         }
@@ -136,7 +119,6 @@ public class UpdateManager {
         }
     }
 
-    private static String MIME_APK = "application/vnd.android.package-archive";
 
     public static void installApk(Context context, String path) {
         File file = new File(path);
@@ -147,9 +129,9 @@ public class UpdateManager {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 Uri apkUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileProvider", file);
                 install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                install.setDataAndType(apkUri, MIME_APK);
+                install.setDataAndType(apkUri, context.getString(R.string.update_mime_apk));
             } else {
-                install.setDataAndType(Uri.fromFile(file), MIME_APK);
+                install.setDataAndType(Uri.fromFile(file), context.getString(R.string.update_mime_apk));
             }
             context.startActivity(install);
         }
@@ -160,11 +142,14 @@ public class UpdateManager {
             if (!TextUtils.isEmpty(url)) {
                 Uri uri = Uri.parse(url);
                 String scheme = uri.getScheme();
-                return uri.buildUpon().appendQueryParameter(Key.VERSION_CODE, version).appendQueryParameter(Key.SCHEME, scheme).build().toString();
+                return uri.buildUpon().appendQueryParameter(Constant.Key.VERSION_CODE, version).appendQueryParameter(Constant.Key.SCHEME, scheme).build().toString();
             }
         } catch (Exception e) {
         }
         return url;
+    }
+    public static void cancel() {
+        APICallManager.get().cancel(TAG_TASK);
     }
 
     private static class CheckUpdateCallBack extends APICallBack<UpdateResponse.DataBean> {

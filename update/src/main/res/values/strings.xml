@@ -10,4 +10,5 @@
     <string name="download_complete_tip">下载完成点击安装</string>
     <string name="download_error_tip">下载失败点击重试</string>
     <string name="download_progress_tip">更新浙江新闻版本到</string>
+    <string name="update_mime_apk">application/vnd.android.package-archive</string>
 </resources>

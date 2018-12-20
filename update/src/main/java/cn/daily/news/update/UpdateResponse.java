@@ -10,6 +10,6 @@ public class UpdateResponse {
     public int code;
     public DataBean data;
     public static class DataBean {
-        public ResourceBiz.LatestVersionBean latest;
+        public VersionBean latest;
     }
 }
