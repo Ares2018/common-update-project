@@ -1,6 +1,6 @@
 package cn.daily.news.update;
 
-public interface Constant {
+public interface Constants {
     interface Key {
         String UPDATE_INFO = "update_info";
         String VERSION_CODE = "version_code";

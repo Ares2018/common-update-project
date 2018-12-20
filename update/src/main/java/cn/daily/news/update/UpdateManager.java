@@ -77,7 +77,7 @@ public class UpdateManager {
                 }
             }
             Bundle args = new Bundle();
-            args.putSerializable(Constant.Key.UPDATE_INFO, latest);
+            args.putSerializable(Constants.Key.UPDATE_INFO, latest);
             updateDialogFragment.setArguments(args);
             updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
         }
@@ -142,7 +142,7 @@ public class UpdateManager {
             if (!TextUtils.isEmpty(url)) {
                 Uri uri = Uri.parse(url);
                 String scheme = uri.getScheme();
-                return uri.buildUpon().appendQueryParameter(Constant.Key.VERSION_CODE, version).appendQueryParameter(Constant.Key.SCHEME, scheme).build().toString();
+                return uri.buildUpon().appendQueryParameter(Constants.Key.VERSION_CODE, version).appendQueryParameter(Constants.Key.SCHEME, scheme).build().toString();
             }
         } catch (Exception e) {
         }

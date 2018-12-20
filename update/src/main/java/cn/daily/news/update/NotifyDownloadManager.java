@@ -68,9 +68,9 @@ public class NotifyDownloadManager {
         @Override
         public void onSuccess(String path) {
             Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
-            data.setAction(Constant.Action.DOWNLOAD_COMPLETE);
-            data.putExtra(Constant.Key.APK_URL, mApkUrl);
-            data.putExtra(Constant.Key.APK_PATH, path);
+            data.setAction(Constants.Action.DOWNLOAD_COMPLETE);
+            data.putExtra(Constants.Key.APK_URL, mApkUrl);
+            data.putExtra(Constants.Key.APK_PATH, path);
 
             PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(intent);
@@ -88,9 +88,9 @@ public class NotifyDownloadManager {
         public void onFail(String err) {
 
             Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
-            data.setAction(Constant.Action.DOWNLOAD_RETRY);
-            data.putExtra(Constant.Key.APK_URL, mApkUrl);
-            data.putExtra(Constant.Key.APK_VERSION, mLastVersion);
+            data.setAction(Constants.Action.DOWNLOAD_RETRY);
+            data.putExtra(Constants.Key.APK_URL, mApkUrl);
+            data.putExtra(Constants.Key.APK_VERSION, mLastVersion);
 
             PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);

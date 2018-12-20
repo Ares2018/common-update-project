@@ -17,7 +17,6 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zjrb.core.common.biz.ResourceBiz;
 import com.zjrb.core.common.permission.AbsPermSingleCallBack;
 import com.zjrb.core.common.permission.IPermissionOperate;
 import com.zjrb.core.common.permission.Permission;
@@ -82,7 +81,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
 
         if (getArguments() != null) {
-            mLatestBean = (VersionBean) getArguments().getSerializable(Constant.Key.UPDATE_INFO);
+            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
             if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
@@ -128,7 +127,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             dismissAllowingStateLoss();
             NonWiFiUpdateDialog dialog = new NonWiFiUpdateDialog();
             Bundle args = new Bundle();
-            args.putSerializable(Constant.Key.UPDATE_INFO, mLatestBean);
+            args.putSerializable(Constants.Key.UPDATE_INFO, mLatestBean);
             dialog.setArguments(args);
             dialog.show(getFragmentManager(), "updateDialog");
         }

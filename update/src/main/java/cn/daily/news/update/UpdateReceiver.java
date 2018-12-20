@@ -20,14 +20,14 @@ public class UpdateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Constant.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
-            String url = intent.getStringExtra(Constant.Key.APK_URL);
-            String path = intent.getStringExtra(Constant.Key.APK_PATH);
+        if (Constants.Action.DOWNLOAD_COMPLETE.equals(intent.getAction())) {
+            String url = intent.getStringExtra(Constants.Key.APK_URL);
+            String path = intent.getStringExtra(Constants.Key.APK_PATH);
             SettingManager.getInstance().setApkPath(url, path);
             UpdateManager.installApk(context, path);
-        } else if (Constant.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
-            String url = intent.getStringExtra(Constant.Key.APK_URL);
-            String version = intent.getStringExtra(Constant.Key.APK_VERSION);
+        } else if (Constants.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
+            String url = intent.getStringExtra(Constants.Key.APK_URL);
+            String version = intent.getStringExtra(Constants.Key.APK_VERSION);
 
             File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             if (!folder.exists()) {
