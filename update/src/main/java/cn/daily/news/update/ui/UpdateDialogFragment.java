@@ -22,7 +22,6 @@ import com.zjrb.core.common.permission.IPermissionOperate;
 import com.zjrb.core.common.permission.Permission;
 import com.zjrb.core.common.permission.PermissionManager;
 import com.zjrb.core.ui.widget.dialog.LoadingIndicatorDialog;
-import com.zjrb.core.utils.DownloadUtil;
 import com.zjrb.core.utils.NetUtils;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
@@ -41,6 +40,7 @@ import cn.daily.news.update.R2;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.util.AnalyticUtil;
+import cn.daily.news.update.util.DownloadUtil;
 
 
 /**

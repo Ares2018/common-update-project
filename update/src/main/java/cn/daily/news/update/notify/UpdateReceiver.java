@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 
-import com.zjrb.core.utils.DownloadUtil;
+import cn.daily.news.update.util.DownloadUtil;
 import com.zjrb.core.utils.SettingManager;
 import com.zjrb.core.utils.UIUtils;
 
