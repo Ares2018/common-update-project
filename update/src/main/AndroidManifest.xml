@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
         <receiver
-            android:name=".UpdateReceiver"
+            android:name=".notify.UpdateReceiver"
             android:exported="false">
         </receiver>
     </application>
