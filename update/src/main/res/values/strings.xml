@@ -11,4 +11,7 @@
     <string name="download_error_tip">下载失败点击重试</string>
     <string name="download_progress_tip">更新浙江新闻版本到</string>
     <string name="update_mime_apk">application/vnd.android.package-archive</string>
+
+    <string name="error_invalid_apk_url">无效的URL</string>
+    <string name="error_invalid_apk_file">不是有效的安装包</string>
 </resources>

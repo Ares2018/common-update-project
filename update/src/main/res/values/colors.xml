@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="_979797_7a7b7d">#979797</color>
+    <color name="_ffffff">#ffffff</color>
+    <color name="_ffffff_7a7b7d">#ffffff</color>
+    <color name="_484848_7a7b7d">#484848</color>
+    <color name="_f44b50_8e3636">#f44b50</color>
+    <color name="_00000000_7a7b7c">#00000000</color>
+
 </resources>

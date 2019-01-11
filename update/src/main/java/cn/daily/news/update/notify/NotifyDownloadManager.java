@@ -8,11 +8,10 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import cn.daily.news.update.util.DownloadUtil;
-import com.zjrb.core.utils.SettingManager;
-import com.zjrb.core.utils.UIUtils;
 
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
+import cn.daily.news.update.util.SPHelper;
 
 /**
  * Created by lixinke on 2017/12/28.
@@ -27,13 +26,15 @@ public class NotifyDownloadManager {
     private DownloadUtil mDownloadUtil;
     private String mLastVersion;
     private String mApkUrl;
+    private Context mContext;
 
-    public NotifyDownloadManager(DownloadUtil downloadUtil, String version, String apkUrl) {
+    public NotifyDownloadManager(Context context,DownloadUtil downloadUtil, String version, String apkUrl) {
         mDownloadUtil = downloadUtil;
         mLastVersion = version;
         mApkUrl = apkUrl;
+        mContext=context;
 
-        mNotificationManager = (NotificationManager) UIUtils.getApp().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("1", "浙江新闻", NotificationManager.IMPORTANCE_LOW);
             channel.enableLights(false);
@@ -41,22 +42,28 @@ public class NotifyDownloadManager {
             channel.setShowBadge(false);
             mNotificationManager.createNotificationChannel(channel);
         }
-        mBuilder = new NotificationCompat.Builder(UIUtils.getApp(), "1");
+        mBuilder = new NotificationCompat.Builder(mContext, "1");
         mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
     }
 
     public void startDownloadApk() {
-        mBuilder.setContentTitle(UIUtils.getString(R.string.app_name));
-        mBuilder.setContentText("更新" + UIUtils.getString(R.string.app_name) + "到" + mLastVersion);
+        mBuilder.setContentTitle(mContext.getString(R.string.app_name));
+        mBuilder.setContentText("更新" + mContext.getString(R.string.app_name) + "到" + mLastVersion);
         mBuilder.setProgress(0, 0, true);
         mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
         mUpdateTime = System.currentTimeMillis();
 
-        mDownloadUtil.setListener(new MyOnDownloadListener()).download(mApkUrl);
+        mDownloadUtil.setListener(new MyOnDownloadListener(mContext)).download(mApkUrl);
     }
 
     private class MyOnDownloadListener implements DownloadUtil.OnDownloadListener {
+        private Context mContext;
+
+        public MyOnDownloadListener(Context context) {
+            mContext = context;
+        }
+
         @Override
         public void onLoading(int progress) {
             if (System.currentTimeMillis() - mUpdateTime < UPDATE_DURATION_TIME) {
@@ -70,33 +77,33 @@ public class NotifyDownloadManager {
 
         @Override
         public void onSuccess(String path) {
-            Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
+            Intent data = new Intent(mContext, UpdateReceiver.class);
             data.setAction(Constants.Action.DOWNLOAD_COMPLETE);
             data.putExtra(Constants.Key.APK_URL, mApkUrl);
             data.putExtra(Constants.Key.APK_PATH, path);
 
-            PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent intent = PendingIntent.getBroadcast(mContext, 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
             mBuilder.setContentIntent(intent);
-            mBuilder.setContentText(UIUtils.getString(R.string.download_complete_tip)).setProgress(0, 0, false);
+            mBuilder.setContentText(mContext.getString(R.string.download_complete_tip)).setProgress(0, 0, false);
             mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
             mBuilder.setAutoCancel(true);
             mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
-            UIUtils.getApp().sendBroadcast(data);
-            SettingManager.getInstance().setApkPath(mApkUrl, path);
+            mContext.sendBroadcast(data);
+            SPHelper.getInstance().setApkPath(mApkUrl, path);
 
         }
 
         @Override
         public void onFail(String err) {
 
-            Intent data = new Intent(UIUtils.getApp(), UpdateReceiver.class);
+            Intent data = new Intent(mContext, UpdateReceiver.class);
             data.setAction(Constants.Action.DOWNLOAD_RETRY);
             data.putExtra(Constants.Key.APK_URL, mApkUrl);
             data.putExtra(Constants.Key.APK_VERSION, mLastVersion);
 
-            PendingIntent intent = PendingIntent.getBroadcast(UIUtils.getApp(), 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
-            mBuilder.setContentText(UIUtils.getString(R.string.download_error_tip)).setProgress(0, 0, false);
+            PendingIntent intent = PendingIntent.getBroadcast(mContext, 100, data, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentText(mContext.getString(R.string.download_error_tip)).setProgress(0, 0, false);
             mBuilder.setContentIntent(intent);
             mBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
             mBuilder.setAutoCancel(true);

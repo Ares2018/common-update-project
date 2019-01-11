@@ -1,18 +1,12 @@
 <resources>
 
 
-    <style name="AppTheme" parent="CoreTheme.Base">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:theme">@style/UpdateTheme</item>
     </style>
-    <style name="AppThemeNight" parent="CoreThemeNight.Base">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:theme">@style/UpdateThemeNight</item>
-    </style>
+
 
 
 </resources>

@@ -3,7 +3,6 @@ package cn.daily.news.update.ui;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -15,38 +14,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.zjrb.core.common.permission.AbsPermSingleCallBack;
-import com.zjrb.core.common.permission.IPermissionOperate;
-import com.zjrb.core.common.permission.Permission;
-import com.zjrb.core.common.permission.PermissionManager;
-import com.zjrb.core.ui.widget.dialog.LoadingIndicatorDialog;
-import com.zjrb.core.utils.NetUtils;
-import com.zjrb.core.utils.SettingManager;
-import com.zjrb.core.utils.UIUtils;
 
 import java.io.File;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import cn.daily.news.update.Constants;
-import cn.daily.news.update.notify.NotifyDownloadManager;
 import cn.daily.news.update.R;
 import cn.daily.news.update.R2;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.model.VersionBean;
+import cn.daily.news.update.notify.NotifyDownloadManager;
 import cn.daily.news.update.util.AnalyticUtil;
 import cn.daily.news.update.util.DownloadUtil;
+import cn.daily.news.update.util.NetUtils;
+import cn.daily.news.update.util.SPHelper;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, IPermissionOperate {
+public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener {
     @BindView(R2.id.update_dialog_title)
     TextView mTitleView;
     @BindView(R2.id.update_dialog_msg)
@@ -70,22 +60,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         mUnBinder = ButterKnife.bind(this, rootView);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
         setCancelable(false);
-
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-
-        PermissionManager.get().request(this, new AbsPermSingleCallBack() {
-            @Override
-            public void onGranted(boolean isAlreadyDef) {
-                initDownload();
-            }
-
-            @Override
-            public void onDenied(List<String> neverAskPerms) {
-
-            }
-        }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
-
         if (getArguments() != null) {
             mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
             mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -127,7 +102,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
     @OnClick(R2.id.update_dialog_ok)
     public void updateApk(View view) {
-        if (NetUtils.isWifi()) {
+        if (NetUtils.isWifi(getActivity())) {
             downloadApk();
         } else {
             dismissAllowingStateLoss();
@@ -142,24 +117,11 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
 
     protected void downloadApk() {
-
-        PermissionManager.get().request(this, new AbsPermSingleCallBack() {
-            @Override
-            public void onGranted(boolean isAlreadyDef) {
-                dismissAllowingStateLoss();
-                if (mDownloadUtil == null) {
-                    initDownload();
-                }
-                new NotifyDownloadManager(mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
-            }
-
-            @Override
-            public void onDenied(List<String> neverAskPerms) {
-                Toast.makeText(getContext(), "请给我写文件的权限", Toast.LENGTH_SHORT).show();
-            }
-        }, Permission.STORAGE_WRITE, Permission.STORAGE_READE);
-
-
+        dismissAllowingStateLoss();
+        if (mDownloadUtil == null) {
+            initDownload();
+        }
+        new NotifyDownloadManager(getActivity(), mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
     }
 
     private void initDownload() {
@@ -171,13 +133,13 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
         mDownloadUtil = DownloadUtil.get()
                 .setDir(folder.getPath())
-                .setFileName(UIUtils.getString(R.string.app_name) + ".apk");
+                .setFileName(getString(R.string.app_name) + ".apk");
     }
 
     protected void forceDownloadApk() {
         if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
             mOkView.setText("安装");
-            UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+            UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
             mProgressBar.show();
@@ -188,7 +150,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @OnClick(R2.id.update_dialog_cancel)
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi()) {
+        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
             if (mDownloadUtil == null) {
                 initDownload();
             }
@@ -199,7 +161,7 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
 
                 @Override
                 public void onSuccess(String path) {
-                    SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+                    SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
                 }
 
                 @Override
@@ -218,14 +180,14 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Override
     public void onSuccess(String path) {
         UpdateManager.installApk(getContext(), path);
-        SettingManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
+        SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
         mProgressBar.dismiss();
         mOkView.setEnabled(true);
         mOkView.setText("安装");
     }
 
     protected void installPreloadApk() {
-        UpdateManager.installApk(getContext(), SettingManager.getInstance().getApkPath(mLatestBean.pkg_url));
+        UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
     }
 
     @Override
@@ -239,23 +201,5 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     public void onDestroyView() {
         super.onDestroyView();
         mUnBinder.unbind();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        PermissionManager.get().onRequestPermissionsResult(requestCode, permissions,
-                grantResults, this);
-    }
-
-    @Override
-    public void exeRequestPermissions(@NonNull String[] permissions, int requestCode) {
-        requestPermissions(permissions, requestCode);
-    }
-
-    @Override
-    public boolean exeShouldShowRequestPermissionRationale(@NonNull String permission) {
-        return shouldShowRequestPermissionRationale(permission);
     }
 }

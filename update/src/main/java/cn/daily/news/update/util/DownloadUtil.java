@@ -1,18 +1,18 @@
 package cn.daily.news.update.util;
 
+import android.content.Context;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
 
-import com.zjrb.core.R;
-import com.zjrb.core.api.okhttp.OkHttpUtils;
-import com.zjrb.core.utils.PathUtil;
-import com.zjrb.core.utils.UIUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cn.daily.news.update.R;
+import cn.daily.news.update.network.OkHttpUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -30,6 +30,7 @@ public class DownloadUtil {
     private OnDownloadListener mListener;
     private static String fileName;
     private static String dir;
+    private Context mContext;
 
     public static DownloadUtil get() {
         if (mInstance == null) {
@@ -39,8 +40,12 @@ public class DownloadUtil {
             }
         }
         fileName = "";
-        dir = "";
+        dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
         return mInstance;
+    }
+
+    public void init(Context context) {
+        mContext = context;
     }
 
     private DownloadUtil() {
@@ -65,17 +70,15 @@ public class DownloadUtil {
 
     public void download(String url) {
         if (TextUtils.isEmpty(url)) {
-            onFail(UIUtils.getString(R.string.error_invalid_apk_url));
+            onFail(mContext.getString(R.string.error_invalid_apk_url));
             return;
         }
         if (TextUtils.isEmpty(fileName))
             fileName = getNameFromUrl(url);
         if (TextUtils.isEmpty(fileName)) {
-            onFail(UIUtils.getString(R.string.error_invalid_apk_url));
+            onFail(mContext.getString(R.string.error_invalid_apk_url));
             return;
         }
-        if (TextUtils.isEmpty(dir))
-            dir = PathUtil.getDownloadPath();
         Request request = new Request.Builder().url(url).build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override

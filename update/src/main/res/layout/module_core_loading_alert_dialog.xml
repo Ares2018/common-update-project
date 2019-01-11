@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="99dp"
+    android:layout_height="99dp"
+    android:background="@drawable/module_core_toast_alter_bg"
+    android:gravity="center"
+    android:minHeight="99dp"
+    android:minWidth="99dp"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <ImageView
+        android:id="@+id/iv_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/module_core_comment_send_clickable"
+        app:maskColor="@color/_00000000_7a7b7c" />
+
+    <TextView
+        android:id="@+id/tv_toast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="正在处理"
+        android:textColor="@color/_ffffff_7a7b7d"
+        android:textSize="@dimen/ts_14sp" />
+
+</LinearLayout>
