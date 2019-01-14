@@ -3,8 +3,11 @@ package cn.daily.news.update.project;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import cn.daily.news.update.UpdateManager;
+import cn.daily.news.update.UpdateType;
+import cn.daily.news.update.listenter.OnOperateListener;
 import cn.daily.news.update.model.VersionBean;
 
 
@@ -35,6 +38,16 @@ public class MainActivity extends AppCompatActivity {
 //                versionBean.force_upgraded = true;
                 UpdateManager.checkUpdate(MainActivity.this, versionBean);
                 UpdateManager.setLayout(R.layout.custom_update_dialog);
+                UpdateManager.setOnOperateListener(new OnOperateListener() {
+                    @Override
+                    public void onOperate(UpdateType type, int id) {
+                        if(id==R.id.update_cancel){
+                            Toast.makeText(MainActivity.this,"cancel",Toast.LENGTH_SHORT).show();
+                        }else if(id==R.id.update_ok){
+                            Toast.makeText(MainActivity.this,"OK",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 

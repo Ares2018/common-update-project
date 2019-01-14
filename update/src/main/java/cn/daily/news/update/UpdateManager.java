@@ -15,6 +15,7 @@ import android.util.Log;
 
 import java.io.File;
 
+import cn.daily.news.update.listenter.OnOperateListener;
 import cn.daily.news.update.model.UpdateResponse;
 import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.ui.ForceUpdateDialog;
@@ -30,7 +31,16 @@ import cn.daily.news.update.util.VersionCompareUtils;
 
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
-    public static int sLayoutId = 0;
+    private static int sLayoutId = 0;
+    private static OnOperateListener sOnOperateListener;
+
+    public static OnOperateListener getOnOperateListener() {
+        return sOnOperateListener;
+    }
+
+    public static void setOnOperateListener(OnOperateListener onOperateListener) {
+        sOnOperateListener = onOperateListener;
+    }
 
     public interface UpdateListener {
         void onUpdate(UpdateResponse.DataBean dataBean);

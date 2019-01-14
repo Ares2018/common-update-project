@@ -24,6 +24,7 @@ import java.io.File;
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
+import cn.daily.news.update.UpdateType;
 import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.notify.NotifyDownloadManager;
 import cn.daily.news.update.util.AnalyticUtil;
@@ -118,6 +119,9 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         } else if (id == R.id.update_cancel) {
             cancelUpdate(v);
         }
+        if (UpdateManager.getOnOperateListener() != null) {
+            UpdateManager.getOnOperateListener().onOperate(getType(), v.getId());
+        }
     }
 
     public void updateApk(View view) {
@@ -132,6 +136,10 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
             dialog.show(getFragmentManager(), "updateDialog");
         }
         AnalyticUtil.ok(getContext());
+    }
+
+    protected UpdateType getType() {
+        return UpdateType.NORMAL;
     }
 
     public void cancelUpdate(View view) {

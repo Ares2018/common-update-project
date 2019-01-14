@@ -7,6 +7,7 @@ import android.view.View;
 
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
+import cn.daily.news.update.UpdateType;
 import cn.daily.news.update.util.AnalyticUtil;
 import cn.daily.news.update.util.DownloadUtil;
 import cn.daily.news.update.util.SPHelper;
@@ -21,13 +22,18 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadU
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-       mCancelView.setVisibility(View.GONE);
+        mCancelView.setVisibility(View.GONE);
     }
 
     @Override
     public void updateApk(View view) {
         forceDownloadApk();
         AnalyticUtil.ok(getContext());
+    }
+
+    @Override
+    protected UpdateType getType() {
+        return UpdateType.FORCE;
     }
 
     @Override

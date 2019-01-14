@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import cn.daily.news.update.R;
+import cn.daily.news.update.UpdateType;
 import cn.daily.news.update.util.AnalyticUtil;
 
 /**
@@ -33,5 +34,10 @@ public class NonWiFiUpdateDialog extends UpdateDialogFragment {
     public void updateApk(View view) {
         downloadApk();
         AnalyticUtil.ok(getContext());
+    }
+
+    @Override
+    protected UpdateType getType() {
+        return UpdateType.NON_WIFI;
     }
 }
