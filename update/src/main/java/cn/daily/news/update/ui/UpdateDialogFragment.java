@@ -1,9 +1,12 @@
 package cn.daily.news.update.ui;
 
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -56,27 +59,34 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setCancelable(false);
+        checkPermission();
+
         View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
         mUnBinder = ButterKnife.bind(this, rootView);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        setCancelable(false);
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         if (getArguments() != null) {
             mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
-            mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
             if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
             } else {
                 mMsgView.setText("有新版本请更新!");
             }
-            mOkView.setText(getOKText());
             mTitleView.setText(getTitle());
+            mOkView.setText(getOKText());
         }
-
-        setCancelable(false);
-
-
         return rootView;
+    }
+
+    private void checkPermission() {
+        int write = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int read = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (write != PackageManager.PERMISSION_GRANTED || read != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
     }
 
     protected void hideCancel() {
