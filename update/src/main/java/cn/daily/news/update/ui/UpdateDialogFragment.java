@@ -35,12 +35,11 @@ import cn.daily.news.update.util.SPHelper;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, View.OnClickListener {
-    private TextView mTitleView;
-    private TextView mMsgView;
-    private View mCancelView;
-    private TextView mOkView;
-    private LoadingIndicatorDialog mProgressBar;
+public class UpdateDialogFragment extends DialogFragment implements View.OnClickListener {
+    protected TextView mTitleView;
+    protected TextView mMsgView;
+    protected View mCancelView;
+    protected TextView mOkView;
 
     protected VersionBean mLatestBean;
     private DownloadUtil mDownloadUtil;
@@ -93,16 +92,8 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }
     }
 
-    protected void hideCancel() {
-        mCancelView.setVisibility(View.GONE);
-    }
-
     protected String getTitle() {
         return "检测到新版本V" + mLatestBean.version + "(版本号),立即更新?";
-    }
-
-    protected void setTitleVisible(int visible) {
-        mTitleView.setVisibility(visible);
     }
 
     protected String getRemark() {
@@ -182,41 +173,9 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
                 .setFileName(getString(R.string.app_name) + ".apk");
     }
 
-    protected void forceDownloadApk() {
-        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
-            mOkView.setText("安装");
-            UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
-        } else {
-            mProgressBar = new LoadingIndicatorDialog(getActivity());
-            mProgressBar.show();
-            DownloadUtil.get().setListener(this).download(mLatestBean.pkg_url);
-        }
-    }
-
-
-    @Override
-    public void onLoading(int progress) {
-
-    }
-
-    @Override
-    public void onSuccess(String path) {
-        UpdateManager.installApk(getContext(), path);
-        SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
-        mProgressBar.dismiss();
-        mOkView.setEnabled(true);
-        mOkView.setText("安装");
-    }
 
     protected void installPreloadApk() {
         UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
-    }
-
-    @Override
-    public void onFail(String err) {
-        mProgressBar.dismiss();
-        mMsgView.setText("更新失败,请稍后再试");
-        mMsgView.setVisibility(View.VISIBLE);
     }
 
     @Override
