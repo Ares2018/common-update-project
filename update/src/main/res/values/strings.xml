@@ -14,4 +14,12 @@
 
     <string name="error_invalid_apk_url">无效的URL</string>
     <string name="error_invalid_apk_file">不是有效的安装包</string>
+    <string name="text_install">安装</string>
+    <string name="text_update">更新</string>
+    <string name="text_tip_fail">更新失败,请稍后再试</string>
+    <string name="text_default_remark">有新版本请更新!</string>
+    <string name="text_default_title">检测到新版本V%s(版本号),立即更新?</string>
+    <string name="text_non_wifi_remark">您正在使用非Wi-Fi网络，更新版本可能产生超额流量费用</string>
+    <string name="text_non_wifi_update">继续更新</string>
+    <string name="text_title_preload">已在WIFI下为您预下载了最新版本%s(版本号),是否立即更新?</string>
 </resources>

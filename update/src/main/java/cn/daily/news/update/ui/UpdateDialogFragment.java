@@ -77,7 +77,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
             if (!TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
             } else {
-                mMsgView.setText("有新版本请更新!");
+                mMsgView.setText(getString(R.string.text_default_remark));
             }
             mTitleView.setText(getTitle());
             mOkView.setText(getOKText());
@@ -93,7 +93,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected String getTitle() {
-        return "检测到新版本V" + mLatestBean.version + "(版本号),立即更新?";
+        return getString(R.string.text_default_title, mLatestBean.version);
     }
 
     protected String getRemark() {
@@ -101,7 +101,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected String getOKText() {
-        return "更新";
+        return getString(R.string.text_update);
     }
 
 

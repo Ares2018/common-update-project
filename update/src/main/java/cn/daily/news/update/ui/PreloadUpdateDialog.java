@@ -2,6 +2,8 @@ package cn.daily.news.update.ui;
 
 import android.view.View;
 
+import cn.daily.news.update.R;
+
 /**
  * Created by lixinke on 2017/10/19.
  */
@@ -9,7 +11,7 @@ import android.view.View;
 public class PreloadUpdateDialog extends UpdateDialogFragment {
     @Override
     protected String getOKText() {
-        return "安装";
+        return getString(R.string.text_install);
     }
 
     @Override
@@ -19,6 +21,6 @@ public class PreloadUpdateDialog extends UpdateDialogFragment {
 
     @Override
     protected String getTitle() {
-        return "已在WIFI下为您预下载了最新版本"+mLatestBean.version+"(版本号),是否立即更新?";
+        return getString(R.string.text_title_preload, mLatestBean.version);
     }
 }

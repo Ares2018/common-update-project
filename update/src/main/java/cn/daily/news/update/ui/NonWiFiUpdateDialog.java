@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import cn.daily.news.update.R;
 import cn.daily.news.update.util.AnalyticUtil;
 
 /**
@@ -20,12 +21,12 @@ public class NonWiFiUpdateDialog extends UpdateDialogFragment {
 
     @Override
     protected String getRemark() {
-        return "您正在使用非Wi-Fi网络，更新版本可能产生超额流量费用";
+        return getString(R.string.text_non_wifi_remark);
     }
 
     @Override
     protected String getOKText() {
-        return "继续更新";
+        return getString(R.string.text_non_wifi_update);
     }
 
     @Override

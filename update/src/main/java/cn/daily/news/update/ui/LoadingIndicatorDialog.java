@@ -6,15 +6,19 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import cn.daily.news.update.R;
 import cn.daily.news.update.listenter.ICancelListener;
@@ -129,13 +133,23 @@ public class LoadingIndicatorDialog extends Dialog {
         View contentView = View.inflate(getContext(),
                 R.layout.module_core_loading_alert_dialog, null);
 
-        mIvIcon = (ImageView) contentView.findViewById(R.id.iv_icon);
-        mTvToast = (TextView) contentView.findViewById(R.id.tv_toast);
+        mIvIcon = contentView.findViewById(R.id.iv_icon);
+        mTvToast = contentView.findViewById(R.id.tv_toast);
         mIvIcon.setImageResource(R.mipmap.module_core_icon_loading_progress);
+        mIvIcon.startAnimation(getAnimation());
         setContentView(contentView);
-
         setCanceledOnTouchOutside(false);
+    }
 
+    @NonNull
+    private Animation getAnimation() {
+        Animation anim = new RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setFillAfter(true);
+        anim.setDuration(5000);
+        anim.setRepeatCount(Animation.INFINITE);
+        anim.setRepeatMode(Animation.RESTART);
+        anim.setInterpolator(new LinearInterpolator());
+        return anim;
     }
 
     private long clickTime;
@@ -144,7 +158,7 @@ public class LoadingIndicatorDialog extends Dialog {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             if ((System.currentTimeMillis() - clickTime) > 1000) {
-                Toast.makeText(getContext(), cancelText,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), cancelText, Toast.LENGTH_SHORT).show();
                 clickTime = System.currentTimeMillis();
                 return true;
             } else {
