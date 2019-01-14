@@ -59,18 +59,23 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         setCancelable(false);
-        View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
+
+        int layoutId = UpdateManager.getLayoutId();
+        if (layoutId == 0) {
+            layoutId = R.layout.fragment_update_dialog;
+        }
+        View rootView = inflater.inflate(layoutId, container, false);
         return rootView;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mTitleView = view.findViewById(R.id.update_dialog_title);
-        mMsgView = view.findViewById(R.id.update_dialog_msg);
+        mTitleView = view.findViewById(R.id.update_title);
+        mMsgView = view.findViewById(R.id.update_remark);
         mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        mOkView = view.findViewById(R.id.update_dialog_ok);
+        mOkView = view.findViewById(R.id.update_ok);
         mOkView.setOnClickListener(this);
-        mCancelView = view.findViewById(R.id.update_dialog_cancel);
+        mCancelView = view.findViewById(R.id.update_cancel);
         mCancelView.setOnClickListener(this);
 
         if (mLatestBean != null) {
@@ -108,9 +113,9 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.update_dialog_ok) {
+        if (id == R.id.update_ok) {
             updateApk(v);
-        } else if (id == R.id.update_dialog_cancel) {
+        } else if (id == R.id.update_cancel) {
             cancelUpdate(v);
         }
     }

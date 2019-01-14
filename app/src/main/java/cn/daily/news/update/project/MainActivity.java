@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 versionBean.version_code = 5000;
 //                versionBean.force_upgraded = true;
                 UpdateManager.checkUpdate(MainActivity.this, versionBean);
+                UpdateManager.setLayout(R.layout.custom_update_dialog);
             }
         });
 

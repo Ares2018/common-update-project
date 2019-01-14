@@ -6,11 +6,12 @@ import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.AttrRes;
+import android.support.annotation.LayoutRes;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-
 
 import java.io.File;
 
@@ -29,6 +30,7 @@ import cn.daily.news.update.util.VersionCompareUtils;
 
 public class UpdateManager {
     public static String TAG_TASK = "tag_task_update_manager";
+    public static int sLayoutId = 0;
 
     public interface UpdateListener {
         void onUpdate(UpdateResponse.DataBean dataBean);
@@ -44,7 +46,7 @@ public class UpdateManager {
     private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
         SPHelper.getInstance().init(activity);
         DownloadUtil.get().init(activity);
-        String versionName="5.0";
+        String versionName = "5.0";
         try {
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
             if (packageInfo != null) {
@@ -54,7 +56,7 @@ public class UpdateManager {
             Log.e("Update", "get version code error", e);
         }
 
-        if (VersionCompareUtils.compareVersionName(versionName,latest.version)==-1) {
+        if (VersionCompareUtils.compareVersionName(versionName, latest.version) == -1) {
             latest.isNeedUpdate = true;
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
@@ -99,7 +101,7 @@ public class UpdateManager {
 
     public static void installApk(Context context, String path) {
         File file = new File(path);
-        if (file!=null && file.exists()) {
+        if (file != null && file.exists()) {
             Intent install = new Intent(Intent.ACTION_VIEW);
             install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             //兼容7.0私有文件权限
@@ -124,5 +126,13 @@ public class UpdateManager {
         } catch (Exception e) {
         }
         return url;
+    }
+
+    public static void setLayout(@LayoutRes int id) {
+        sLayoutId = id;
+    }
+
+    public static int getLayoutId(){
+        return sLayoutId;
     }
 }
