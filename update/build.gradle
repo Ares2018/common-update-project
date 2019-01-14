@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jakewharton.butterknife'
 apply from: 'http://10.100.62.98:8086/nexus/service/local/artifact/maven/redirect?r=releases&g=cn.daily.android&a=publish&e=gradle&v=0.0.8'
 
 
@@ -34,6 +33,4 @@ dependencies {
     implementation 'cn.daily.android:analytics:5.6.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.8.1'
     implementation 'com.aliya:android-uimode:2.0.8'
-    implementation 'com.jakewharton:butterknife:9.0.0-rc1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc1'
 }

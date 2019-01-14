@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -20,13 +21,8 @@ import android.widget.TextView;
 
 import java.io.File;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
-import cn.daily.news.update.R2;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.notify.NotifyDownloadManager;
@@ -39,38 +35,47 @@ import cn.daily.news.update.util.SPHelper;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener {
-    @BindView(R2.id.update_dialog_title)
-    TextView mTitleView;
-    @BindView(R2.id.update_dialog_msg)
-    TextView mMsgView;
-    @BindView(R2.id.update_dialog_cancel)
-    View mCancelView;
-    @BindView(R2.id.update_dialog_ok)
-    TextView mOkView;
-    LoadingIndicatorDialog mProgressBar;
+public class UpdateDialogFragment extends DialogFragment implements DownloadUtil.OnDownloadListener, View.OnClickListener {
+    private TextView mTitleView;
+    private TextView mMsgView;
+    private View mCancelView;
+    private TextView mOkView;
+    private LoadingIndicatorDialog mProgressBar;
 
-    private Unbinder mUnBinder;
     protected VersionBean mLatestBean;
-
     private DownloadUtil mDownloadUtil;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        checkPermission();
+        Bundle args = getArguments();
+        if (args != null) {
+            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         setCancelable(false);
-        checkPermission();
-
         View rootView = inflater.inflate(R.layout.fragment_update_dialog, container, false);
-        mUnBinder = ButterKnife.bind(this, rootView);
-        mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        return rootView;
+    }
 
-        if (getArguments() != null) {
-            mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
-            if (mLatestBean != null && !TextUtils.isEmpty(getRemark())) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        mTitleView = view.findViewById(R.id.update_dialog_title);
+        mMsgView = view.findViewById(R.id.update_dialog_msg);
+        mMsgView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        mOkView = view.findViewById(R.id.update_dialog_ok);
+        mOkView.setOnClickListener(this);
+        mCancelView = view.findViewById(R.id.update_dialog_cancel);
+        mCancelView.setOnClickListener(this);
+
+        if (mLatestBean != null) {
+            if (!TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
             } else {
                 mMsgView.setText("有新版本请更新!");
@@ -78,7 +83,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
             mTitleView.setText(getTitle());
             mOkView.setText(getOKText());
         }
-        return rootView;
     }
 
     private void checkPermission() {
@@ -110,7 +114,16 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     }
 
 
-    @OnClick(R2.id.update_dialog_ok)
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.update_dialog_ok) {
+            updateApk(v);
+        } else if (id == R.id.update_dialog_cancel) {
+            cancelUpdate(v);
+        }
+    }
+
     public void updateApk(View view) {
         if (NetUtils.isWifi(getActivity())) {
             downloadApk();
@@ -125,6 +138,29 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         AnalyticUtil.ok(getContext());
     }
 
+    public void cancelUpdate(View view) {
+        dismissAllowingStateLoss();
+        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
+            if (mDownloadUtil == null) {
+                initDownload();
+            }
+            mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
+                @Override
+                public void onLoading(int progress) {
+                }
+
+                @Override
+                public void onSuccess(String path) {
+                    SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
+                }
+
+                @Override
+                public void onFail(String err) {
+                }
+            }).download(mLatestBean.pkg_url);
+        }
+        AnalyticUtil.cancel(getContext());
+    }
 
     protected void downloadApk() {
         dismissAllowingStateLoss();
@@ -157,30 +193,6 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
         }
     }
 
-    @OnClick(R2.id.update_dialog_cancel)
-    public void cancelUpdate(View view) {
-        dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
-            if (mDownloadUtil == null) {
-                initDownload();
-            }
-            mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
-                @Override
-                public void onLoading(int progress) {
-                }
-
-                @Override
-                public void onSuccess(String path) {
-                    SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
-                }
-
-                @Override
-                public void onFail(String err) {
-                }
-            }).download(mLatestBean.pkg_url);
-        }
-        AnalyticUtil.cancel(getContext());
-    }
 
     @Override
     public void onLoading(int progress) {
@@ -210,6 +222,5 @@ public class UpdateDialogFragment extends DialogFragment implements DownloadUtil
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnBinder.unbind();
     }
 }
