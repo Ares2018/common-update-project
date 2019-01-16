@@ -6,12 +6,12 @@ import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.AttrRes;
 import android.support.annotation.LayoutRes;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -48,14 +48,21 @@ public class UpdateManager {
         void onError(String errMsg, int errCode);
     }
 
-    public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
-        checkData(latest_version, appCompatActivity, null);
+    public static void init(Context context) {
+        SPHelper.getInstance().init(context);
+        DownloadUtil.get().init(context);
     }
 
+    public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
+        checkData(appCompatActivity, latest_version, null);
+    }
 
-    private static void checkData(VersionBean latest, AppCompatActivity activity, UpdateListener listener) {
-        SPHelper.getInstance().init(activity);
-        DownloadUtil.get().init(activity);
+    public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean versionBean, String tip) {
+        checkData(appCompatActivity, versionBean, tip);
+    }
+
+    private static void checkData(AppCompatActivity activity, VersionBean latest, String tip) {
+
         String versionName = "5.0";
         try {
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
@@ -83,12 +90,8 @@ public class UpdateManager {
             args.putSerializable(Constants.Key.UPDATE_INFO, latest);
             updateDialogFragment.setArguments(args);
             updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
-        }
-
-        if (listener != null) {
-            UpdateResponse.DataBean dataBean = new UpdateResponse.DataBean();
-            dataBean.latest = latest;
-            listener.onUpdate(dataBean);
+        } else if (!TextUtils.isEmpty(tip)) {
+            Toast.makeText(activity, tip, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -106,6 +109,10 @@ public class UpdateManager {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static String getPreloadApkPah(String pkg_url) {
+        return SPHelper.getInstance().getApkPath(pkg_url);
     }
 
 
@@ -126,23 +133,11 @@ public class UpdateManager {
         }
     }
 
-    public static String getApkKey(String url, String version) {
-        try {
-            if (!TextUtils.isEmpty(url)) {
-                Uri uri = Uri.parse(url);
-                String scheme = uri.getScheme();
-                return uri.buildUpon().appendQueryParameter(Constants.Key.VERSION_CODE, version).appendQueryParameter(Constants.Key.SCHEME, scheme).build().toString();
-            }
-        } catch (Exception e) {
-        }
-        return url;
-    }
-
     public static void setLayout(@LayoutRes int id) {
         sLayoutId = id;
     }
 
-    public static int getLayoutId(){
+    public static int getLayoutId() {
         return sLayoutId;
     }
 }
