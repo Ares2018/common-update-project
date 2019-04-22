@@ -3,6 +3,8 @@ package cn.daily.news.update.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -13,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +56,12 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         if (args != null) {
             mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     @Nullable
@@ -99,7 +108,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected String getTitle() {
-        return getString(R.string.text_default_title, mLatestBean.version);
+        return getString(R.string.text_default_title);
     }
 
     protected String getRemark() {

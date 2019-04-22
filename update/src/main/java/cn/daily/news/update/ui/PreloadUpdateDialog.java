@@ -14,7 +14,7 @@ import cn.daily.news.update.util.AnalyticUtil;
 public class PreloadUpdateDialog extends UpdateDialogFragment {
     @Override
     protected String getOKText() {
-        return getString(R.string.text_install);
+        return getString(R.string.text_update);
     }
 
     @Override
