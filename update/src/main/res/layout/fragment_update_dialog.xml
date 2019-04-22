@@ -37,7 +37,7 @@
                 android:layout_marginBottom="16dp"
                 android:fontFamily="@font/fzzcysk_zbjt"
                 android:gravity="center"
-                tools:text="更新提示"
+                tools:text="@string/text_default_title"
                 android:textColor="#ff222222"
                 android:textSize="14sp" />
 

@@ -13,9 +13,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,8 +111,14 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         }
     }
 
-    protected String getTitle() {
-        return getString(R.string.text_default_title);
+    protected SpannableString getTitle() {
+        String title = getString(R.string.text_default_title)+"\t";
+        String version=" "+mLatestBean.version+" ";
+        SpannableString spannableString = new SpannableString(title + version);
+        spannableString.setSpan(new AbsoluteSizeSpan(12,true), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(new ForegroundColorSpan(Color.parseColor("#ffffff")), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(new BackgroundColorSpan(Color.parseColor("#D12324")), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannableString;
     }
 
     protected String getRemark() {

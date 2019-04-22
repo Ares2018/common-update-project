@@ -1,5 +1,6 @@
 package cn.daily.news.update.ui;
 
+import android.text.SpannableString;
 import android.view.View;
 
 import cn.daily.news.update.R;
@@ -32,8 +33,8 @@ public class PreloadUpdateDialog extends UpdateDialogFragment {
     }
 
     @Override
-    protected String getTitle() {
-        return getString(R.string.text_title_preload, mLatestBean.version);
+    protected SpannableString getTitle() {
+        return new SpannableString(getString(R.string.text_title_preload, mLatestBean.version));
     }
 
     @Override
