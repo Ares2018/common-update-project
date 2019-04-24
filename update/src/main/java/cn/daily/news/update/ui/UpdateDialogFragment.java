@@ -91,7 +91,6 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         mOkView.setOnClickListener(this);
         mCancelView = view.findViewById(R.id.update_cancel);
         mCancelView.setOnClickListener(this);
-
         if (mLatestBean != null) {
             if (!TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));

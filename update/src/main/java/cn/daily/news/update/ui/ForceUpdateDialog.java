@@ -18,11 +18,17 @@ import cn.daily.news.update.util.SPHelper;
 
 public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadUtil.OnDownloadListener {
     private LoadingIndicatorDialog mProgressBar;
+    private View mDividerView;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mCancelView.setVisibility(View.GONE);
+        mDividerView = view.findViewById(R.id.update_btn_divider);
+        if (mDividerView != null) {
+            mDividerView.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -38,12 +44,11 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadU
 
     @Override
     protected String getOKText() {
-        return UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) ? getString(R.string.text_install) : getString(R.string.text_update);
+        return getString(R.string.text_update);
     }
 
     protected void forceDownloadApk() {
         if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
-            mOkView.setText(R.string.text_install);
             UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
@@ -54,7 +59,6 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadU
 
     @Override
     public void onLoading(int progress) {
-
     }
 
     @Override
@@ -63,7 +67,6 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadU
         SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
         mProgressBar.dismiss();
         mOkView.setEnabled(true);
-        mOkView.setText(R.string.text_install);
     }
 
     @Override

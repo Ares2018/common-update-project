@@ -89,6 +89,7 @@
                     android:textSize="14sp" />
 
                 <View
+                    android:id="@+id/update_btn_divider"
                     android:layout_width="20dp"
                     android:layout_height="1dp" />
 

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                         "<p>4、4.4.4 的大屏幕安装失败的情况</p>\n";
                 versionBean.version = "6.6.2";
                 versionBean.version_code = 60602;
-//                versionBean.force_upgraded = true;
+                versionBean.force_upgraded = true;
                 UpdateManager.checkUpdate(MainActivity.this, versionBean);
                 UpdateManager.setOnOperateListener(new OnOperateListener() {
                     @Override
