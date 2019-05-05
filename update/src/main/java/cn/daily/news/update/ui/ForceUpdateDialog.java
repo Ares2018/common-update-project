@@ -8,7 +8,6 @@ import android.view.View;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
-import cn.daily.news.update.util.AnalyticUtil;
 import cn.daily.news.update.util.DownloadUtil;
 import cn.daily.news.update.util.SPHelper;
 
@@ -34,7 +33,6 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadU
     @Override
     public void updateApk(View view) {
         forceDownloadApk();
-        AnalyticUtil.ok(getContext());
     }
 
     @Override

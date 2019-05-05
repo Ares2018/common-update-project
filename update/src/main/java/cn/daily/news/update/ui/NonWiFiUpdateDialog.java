@@ -7,7 +7,6 @@ import android.view.View;
 
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateType;
-import cn.daily.news.update.util.AnalyticUtil;
 
 /**
  * Created by lixinke on 2017/10/19.
@@ -33,7 +32,6 @@ public class NonWiFiUpdateDialog extends UpdateDialogFragment {
     @Override
     public void updateApk(View view) {
         downloadApk();
-        AnalyticUtil.ok(getContext());
     }
 
     @Override

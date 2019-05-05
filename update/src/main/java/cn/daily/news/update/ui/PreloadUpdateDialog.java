@@ -6,7 +6,6 @@ import android.view.View;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
-import cn.daily.news.update.util.AnalyticUtil;
 
 /**
  * Created by lixinke on 2017/10/19.
@@ -23,7 +22,6 @@ public class PreloadUpdateDialog extends UpdateDialogFragment {
         if(UpdateManager.getOnOperateListener()!=null){
             UpdateManager.getOnOperateListener().onOperate(UpdateType.PRELOAD,view.getId());
         }
-        AnalyticUtil.ok(getContext());
         installPreloadApk();
     }
 
