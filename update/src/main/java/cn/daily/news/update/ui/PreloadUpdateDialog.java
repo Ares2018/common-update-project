@@ -4,7 +4,6 @@ import android.text.SpannableString;
 import android.view.View;
 
 import cn.daily.news.update.R;
-import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
 
 /**
