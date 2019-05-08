@@ -19,9 +19,6 @@ public class PreloadUpdateDialog extends UpdateDialogFragment {
 
     @Override
     public void updateApk(View view) {
-        if(UpdateManager.getOnOperateListener()!=null){
-            UpdateManager.getOnOperateListener().onOperate(UpdateType.PRELOAD,view.getId());
-        }
         installPreloadApk();
     }
 
