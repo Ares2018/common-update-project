@@ -61,8 +61,7 @@ public class UpdateManager {
         checkData(appCompatActivity, versionBean, tip);
     }
 
-    private static void checkData(AppCompatActivity activity, VersionBean latest, String tip) {
-
+    public static boolean isNeedUpdate(AppCompatActivity activity, VersionBean latest) {
         String versionName = "5.0";
         try {
             PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
@@ -74,6 +73,13 @@ public class UpdateManager {
         }
 
         if (VersionCompareUtils.compareVersionName(versionName, latest.version) == -1) {
+            return true;
+        }
+        return false;
+    }
+
+    private static void checkData(AppCompatActivity activity, VersionBean latest, String tip) {
+        if (isNeedUpdate(activity, latest)) {
             latest.isNeedUpdate = true;
             UpdateDialogFragment updateDialogFragment;
             if (latest.force_upgraded) {
