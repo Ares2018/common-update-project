@@ -56,6 +56,11 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadU
     }
 
     @Override
+    public void onStart(long total) {
+        SPHelper.getInstance().setApkSize(mLatestBean.pkg_url,total);
+    }
+
+    @Override
     public void onLoading(int progress) {
     }
 

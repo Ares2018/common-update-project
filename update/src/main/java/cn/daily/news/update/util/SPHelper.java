@@ -17,7 +17,7 @@ public class SPHelper {
     private SPHelper() {
     }
 
-    public  void init(Context context) {
+    public void init(Context context) {
         mContext = context;
         if (mContext != null) {
             mPreferences = mContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
@@ -68,6 +68,17 @@ public class SPHelper {
             return 0;
         }
         return mPreferences.getInt(Name.LAST_VERSION_CODE, 0);
+    }
+
+    public void setApkSize(String pkg_url, long total) {
+        put(pkg_url, total);
+    }
+
+    public long getApkSize(String pkg_url) {
+        if (mPreferences == null) {
+            return 0;
+        }
+        return mPreferences.getInt(pkg_url, 0);
     }
 
     interface Name {

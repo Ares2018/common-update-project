@@ -177,6 +177,11 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
                 @Override
                 public void onFail(String err) {
                 }
+
+                @Override
+                public void onStart(long total) {
+                    SPHelper.getInstance().setApkSize(mLatestBean.pkg_url,total);
+                }
             }).download(mLatestBean.pkg_url);
         }
     }

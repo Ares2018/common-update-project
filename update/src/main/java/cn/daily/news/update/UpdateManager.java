@@ -107,9 +107,11 @@ public class UpdateManager {
             String path = SPHelper.getInstance().getApkPath(pkg_url);
             if (!TextUtils.isEmpty(path)) {
                 File file = new File(path);
-                if (file.exists()) {
+                long total = SPHelper.getInstance().getApkSize(pkg_url);
+                if (file.exists() && file.length() > 0 && file.length() == total) {
                     return true;
                 }
+                return false;
             }
             return false;
         } catch (Exception e) {

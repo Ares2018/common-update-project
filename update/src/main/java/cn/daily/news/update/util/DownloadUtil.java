@@ -94,6 +94,7 @@ public class DownloadUtil {
                 try {
                     is = response.body().byteStream();
                     long total = response.body().contentLength();
+                    onStart(total);
                     File file = new File(dir, fileName);
                     if (!file.exists())
                         file.createNewFile();
@@ -127,6 +128,17 @@ public class DownloadUtil {
             }
         });
 
+    }
+
+    private void onStart(final long total){
+        mainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if(mListener!=null){
+                    mListener.onStart(total);
+                }
+            }
+        });
     }
 
     private void onSuccess(final String path) {
@@ -193,5 +205,11 @@ public class DownloadUtil {
          * @param err 错误信息
          */
         void onFail(String err);
+
+        /**
+         * 开始下载
+         * @param total apk包总的大小
+         */
+        void onStart(long total);
     }
 }

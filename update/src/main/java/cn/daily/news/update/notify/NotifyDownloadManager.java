@@ -65,6 +65,11 @@ public class NotifyDownloadManager {
         }
 
         @Override
+        public void onStart(long total) {
+            SPHelper.getInstance().setApkSize(mApkUrl,total);
+        }
+
+        @Override
         public void onLoading(int progress) {
             if (System.currentTimeMillis() - mUpdateTime < UPDATE_DURATION_TIME) {
                 return;
