@@ -38,11 +38,11 @@ public class SPHelper {
             editor.putBoolean(key, (Boolean) value);
         } else if (value instanceof String) {
             editor.putString(key, (String) value);
-        }else if(value instanceof Long){
+        } else if (value instanceof Long) {
             editor.putLong(key, (Long) value);
-        }else if (value instanceof Integer){
+        } else if (value instanceof Integer) {
             editor.putInt(key, (Integer) value);
-        }else if(value instanceof Float){
+        } else if (value instanceof Float) {
             editor.putFloat(key, (Float) value);
         }
 
@@ -77,18 +77,19 @@ public class SPHelper {
     }
 
     public void setApkSize(String pkg_url, long total) {
-        put(pkg_url+"size", total);
+        put(pkg_url + Name.APK_SIZE, total);
     }
 
     public long getApkSize(String pkg_url) {
         if (mPreferences == null) {
             return 0;
         }
-        return mPreferences.getLong(pkg_url+"size", 0);
+        return mPreferences.getLong(pkg_url + Name.APK_SIZE, 0);
     }
 
     interface Name {
         String IS_NEED_UPDATE = "is_need_update";
         String LAST_VERSION_CODE = "last_version_code";
+        String APK_SIZE = "apk_size";
     }
 }
