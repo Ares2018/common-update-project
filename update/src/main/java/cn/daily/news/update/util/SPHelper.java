@@ -77,14 +77,14 @@ public class SPHelper {
     }
 
     public void setApkSize(String pkg_url, long total) {
-        put(pkg_url, total);
+        put(pkg_url+"size", total);
     }
 
     public long getApkSize(String pkg_url) {
         if (mPreferences == null) {
             return 0;
         }
-        return mPreferences.getLong(pkg_url, 0);
+        return mPreferences.getLong(pkg_url+"size", 0);
     }
 
     interface Name {
