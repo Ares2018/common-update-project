@@ -23,8 +23,8 @@ import okhttp3.Response;
  * 文件下载工具类
  * Created by wangzhen on 2017/6/26.
  */
-public class DownloadUtil {
-    private static DownloadUtil mInstance;
+public class DownloadManager {
+    private static DownloadManager mInstance;
     private final OkHttpClient okHttpClient;
     private final Handler mainThreadHandler;
     private OnDownloadListener mListener;
@@ -32,11 +32,11 @@ public class DownloadUtil {
     private static String dir;
     private Context mContext;
 
-    public static DownloadUtil get() {
+    public static DownloadManager get() {
         if (mInstance == null) {
-            synchronized (DownloadUtil.class) {
+            synchronized (DownloadManager.class) {
                 if (mInstance == null)
-                    mInstance = new DownloadUtil();
+                    mInstance = new DownloadManager();
             }
         }
         fileName = "";
@@ -48,22 +48,22 @@ public class DownloadUtil {
         mContext = context;
     }
 
-    private DownloadUtil() {
+    private DownloadManager() {
         okHttpClient = OkHttpUtils.getClient();
         mainThreadHandler = new Handler();
     }
 
-    public DownloadUtil setDir(String dir) {
+    public DownloadManager setDir(String dir) {
         this.dir = dir;
         return this;
     }
 
-    public DownloadUtil setFileName(String fileName) {
+    public DownloadManager setFileName(String fileName) {
         this.fileName = fileName;
         return this;
     }
 
-    public DownloadUtil setListener(OnDownloadListener listener) {
+    public DownloadManager setListener(OnDownloadListener listener) {
         this.mListener = listener;
         return this;
     }

@@ -21,7 +21,7 @@ import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.ui.ForceUpdateDialog;
 import cn.daily.news.update.ui.PreloadUpdateDialog;
 import cn.daily.news.update.ui.UpdateDialogFragment;
-import cn.daily.news.update.util.DownloadUtil;
+import cn.daily.news.update.util.DownloadManager;
 import cn.daily.news.update.util.SPHelper;
 import cn.daily.news.update.util.VersionCompareUtils;
 
@@ -50,7 +50,7 @@ public class UpdateManager {
 
     public static void init(Context context) {
         SPHelper.getInstance().init(context);
-        DownloadUtil.get().init(context);
+        DownloadManager.get().init(context);
     }
 
     public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {

@@ -34,7 +34,7 @@ import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
 import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.notify.NotifyDownloadManager;
-import cn.daily.news.update.util.DownloadUtil;
+import cn.daily.news.update.util.DownloadManager;
 import cn.daily.news.update.util.NetUtils;
 import cn.daily.news.update.util.SPHelper;
 
@@ -49,7 +49,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     protected TextView mOkView;
 
     protected VersionBean mLatestBean;
-    private DownloadUtil mDownloadUtil;
+    private DownloadManager mDownloadManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -161,10 +161,10 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
         if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
-            if (mDownloadUtil == null) {
+            if (mDownloadManager == null) {
                 initDownload();
             }
-            mDownloadUtil.setListener(new DownloadUtil.OnDownloadListener() {
+            mDownloadManager.setListener(new DownloadManager.OnDownloadListener() {
                 @Override
                 public void onLoading(int progress) {
                 }
@@ -188,10 +188,10 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
     protected void downloadApk() {
         dismissAllowingStateLoss();
-        if (mDownloadUtil == null) {
+        if (mDownloadManager == null) {
             initDownload();
         }
-        new NotifyDownloadManager(getActivity(), mDownloadUtil, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
+        new NotifyDownloadManager(getActivity(), mDownloadManager, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
     }
 
     private void initDownload() {
@@ -201,7 +201,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
             folder.mkdirs();
         }
 
-        mDownloadUtil = DownloadUtil.get()
+        mDownloadManager = DownloadManager.get()
                 .setDir(folder.getPath())
                 .setFileName(getString(R.string.app_name) + ".apk");
     }

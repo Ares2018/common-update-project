@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import cn.daily.news.update.util.DownloadUtil;
+import cn.daily.news.update.util.DownloadManager;
 
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
@@ -23,13 +23,13 @@ public class NotifyDownloadManager {
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
     private long mUpdateTime;
-    private DownloadUtil mDownloadUtil;
+    private DownloadManager mDownloadManager;
     private String mLastVersion;
     private String mApkUrl;
     private Context mContext;
 
-    public NotifyDownloadManager(Context context,DownloadUtil downloadUtil, String version, String apkUrl) {
-        mDownloadUtil = downloadUtil;
+    public NotifyDownloadManager(Context context, DownloadManager downloadManager, String version, String apkUrl) {
+        mDownloadManager = downloadManager;
         mLastVersion = version;
         mApkUrl = apkUrl;
         mContext=context;
@@ -54,10 +54,10 @@ public class NotifyDownloadManager {
 
         mUpdateTime = System.currentTimeMillis();
 
-        mDownloadUtil.setListener(new MyOnDownloadListener(mContext)).download(mApkUrl);
+        mDownloadManager.setListener(new MyOnDownloadListener(mContext)).download(mApkUrl);
     }
 
-    private class MyOnDownloadListener implements DownloadUtil.OnDownloadListener {
+    private class MyOnDownloadListener implements DownloadManager.OnDownloadListener {
         private Context mContext;
 
         public MyOnDownloadListener(Context context) {

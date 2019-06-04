@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 
-import cn.daily.news.update.util.DownloadUtil;
+import cn.daily.news.update.util.DownloadManager;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ import cn.daily.news.update.util.SPHelper;
  */
 
 public class UpdateReceiver extends BroadcastReceiver {
-    private DownloadUtil mDownloadUtil;
+    private DownloadManager mDownloadManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -37,10 +37,10 @@ public class UpdateReceiver extends BroadcastReceiver {
                 folder.mkdirs();
             }
 
-            mDownloadUtil = DownloadUtil.get()
+            mDownloadManager = DownloadManager.get()
                     .setDir(folder.getPath())
                     .setFileName(context.getString(R.string.app_name) + ".apk");
-            new NotifyDownloadManager(context,mDownloadUtil, version, url).startDownloadApk();
+            new NotifyDownloadManager(context, mDownloadManager, version, url).startDownloadApk();
         }
     }
 }
