@@ -38,6 +38,12 @@ public class SPHelper {
             editor.putBoolean(key, (Boolean) value);
         } else if (value instanceof String) {
             editor.putString(key, (String) value);
+        }else if(value instanceof Long){
+            editor.putLong(key, (Long) value);
+        }else if (value instanceof Integer){
+            editor.putInt(key, (Integer) value);
+        }else if(value instanceof Float){
+            editor.putFloat(key, (Float) value);
         }
 
         editor.commit();
@@ -78,7 +84,7 @@ public class SPHelper {
         if (mPreferences == null) {
             return 0;
         }
-        return mPreferences.getInt(pkg_url, 0);
+        return mPreferences.getLong(pkg_url, 0);
     }
 
     interface Name {
