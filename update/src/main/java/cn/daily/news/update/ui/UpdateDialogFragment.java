@@ -150,25 +150,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
         if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
-            mDownloadManager.setListener(new DownloadManager.OnDownloadListener() {
-                @Override
-                public void onLoading(int progress) {
-                }
-
-                @Override
-                public void onSuccess(String path) {
-                    SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
-                }
-
-                @Override
-                public void onFail(String err) {
-                }
-
-                @Override
-                public void onStart(long total) {
-                    SPHelper.getInstance().setApkSize(mLatestBean.pkg_url, total);
-                }
-            }).download(mLatestBean.pkg_url);
+            mDownloadManager.setListener(new CancelDownloadListener()).download(mLatestBean.pkg_url);
         }
     }
 
@@ -185,5 +167,25 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    private class CancelDownloadListener implements DownloadManager.OnDownloadListener {
+        @Override
+        public void onLoading(int progress) {
+        }
+
+        @Override
+        public void onSuccess(String path) {
+            SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
+        }
+
+        @Override
+        public void onFail(String err) {
+        }
+
+        @Override
+        public void onStart(long total) {
+            SPHelper.getInstance().setApkSize(mLatestBean.pkg_url, total);
+        }
     }
 }
