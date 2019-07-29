@@ -8,6 +8,7 @@ public interface Constants {
         String APK_URL = "download_apk_url";
         String APK_PATH = "download_apk_local_path";
         String APK_VERSION = "download_apk_version";
+        String APK_FOLDER = "download";
     }
 
     interface Action {

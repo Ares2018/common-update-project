@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import com.aliya.uimode.utils.UiModeUtils;
+
 import cn.daily.news.update.util.DownloadManager;
 
 import cn.daily.news.update.Constants;
@@ -36,7 +38,7 @@ public class NotifyDownloadManager {
 
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("1", "浙江新闻", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel("1",mContext.getString(R.string.app_name), NotificationManager.IMPORTANCE_LOW);
             channel.enableLights(false);
             channel.enableVibration(false);
             channel.setShowBadge(false);

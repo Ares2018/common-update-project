@@ -19,7 +19,6 @@ import cn.daily.news.update.util.SPHelper;
  */
 
 public class UpdateReceiver extends BroadcastReceiver {
-    private DownloadManager mDownloadManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -31,16 +30,7 @@ public class UpdateReceiver extends BroadcastReceiver {
         } else if (Constants.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
             String url = intent.getStringExtra(Constants.Key.APK_URL);
             String version = intent.getStringExtra(Constants.Key.APK_VERSION);
-
-            File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-
-            mDownloadManager = DownloadManager.get()
-                    .setDir(folder.getPath())
-                    .setFileName(context.getString(R.string.app_name) + ".apk");
-            new NotifyDownloadManager(context, mDownloadManager, version, url).startDownloadApk();
+            new NotifyDownloadManager(context, new DownloadManager(context), version, url).startDownloadApk();
         }
     }
 }

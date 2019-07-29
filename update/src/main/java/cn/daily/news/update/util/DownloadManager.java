@@ -1,16 +1,16 @@
 package cn.daily.news.update.util;
 
 import android.content.Context;
-import android.os.Environment;
+import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
 import cn.daily.news.update.network.OkHttpUtils;
 import okhttp3.Call;
@@ -24,43 +24,25 @@ import okhttp3.Response;
  * Created by wangzhen on 2017/6/26.
  */
 public class DownloadManager {
-    private static DownloadManager mInstance;
     private final OkHttpClient okHttpClient;
     private final Handler mainThreadHandler;
     private OnDownloadListener mListener;
-    private static String fileName;
-    private static String dir;
+    private String fileName;
+    private String dir;
     private Context mContext;
 
-    public static DownloadManager get() {
-        if (mInstance == null) {
-            synchronized (DownloadManager.class) {
-                if (mInstance == null)
-                    mInstance = new DownloadManager();
-            }
-        }
-        fileName = "";
-        dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-        return mInstance;
-    }
 
-    public void init(Context context) {
+    public DownloadManager(Context context) {
         mContext = context;
-    }
-
-    private DownloadManager() {
         okHttpClient = OkHttpUtils.getClient();
         mainThreadHandler = new Handler();
-    }
+        File folder = new File(mContext.getExternalCacheDir(), Constants.Key.APK_FOLDER);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
 
-    public DownloadManager setDir(String dir) {
-        this.dir = dir;
-        return this;
-    }
-
-    public DownloadManager setFileName(String fileName) {
-        this.fileName = fileName;
-        return this;
+        dir = folder.getPath();
+        fileName = mContext.getString(R.string.app_name) + ".apk";
     }
 
     public DownloadManager setListener(OnDownloadListener listener) {
@@ -130,11 +112,11 @@ public class DownloadManager {
 
     }
 
-    private void onStart(final long total){
+    private void onStart(final long total) {
         mainThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                if(mListener!=null){
+                if (mListener != null) {
                     mListener.onStart(total);
                 }
             }
@@ -181,7 +163,10 @@ public class DownloadManager {
      * @return 文件名
      */
     private String getNameFromUrl(String url) {
-        return url.substring(url.lastIndexOf("/") + 1);
+        if (TextUtils.isEmpty(url)) {
+            return "";
+        }
+        return Uri.parse(url).getLastPathSegment();
     }
 
     public interface OnDownloadListener {
@@ -208,6 +193,7 @@ public class DownloadManager {
 
         /**
          * 开始下载
+         *
          * @param total apk包总的大小
          */
         void onStart(long total);

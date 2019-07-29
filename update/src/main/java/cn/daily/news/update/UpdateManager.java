@@ -50,7 +50,6 @@ public class UpdateManager {
 
     public static void init(Context context) {
         SPHelper.getInstance().init(context);
-        DownloadManager.get().init(context);
     }
 
     public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {

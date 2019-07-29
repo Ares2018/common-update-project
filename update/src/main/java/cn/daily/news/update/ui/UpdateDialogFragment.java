@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -25,8 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
-
-import java.io.File;
 
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
@@ -54,11 +51,11 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkPermission();
         Bundle args = getArguments();
         if (args != null) {
             mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
         }
+        mDownloadManager = new DownloadManager(getContext());
     }
 
     @Override
@@ -101,19 +98,11 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         }
     }
 
-    private void checkPermission() {
-        int write = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int read = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (write != PackageManager.PERMISSION_GRANTED || read != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-        }
-    }
-
     protected SpannableString getTitle() {
-        String title = getString(R.string.text_default_title)+"\t";
-        String version=" "+mLatestBean.version+" ";
+        String title = getString(R.string.text_default_title) + "\t";
+        String version = " " + mLatestBean.version + " ";
         SpannableString spannableString = new SpannableString(title + version);
-        spannableString.setSpan(new AbsoluteSizeSpan(12,true), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(new AbsoluteSizeSpan(12, true), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new ForegroundColorSpan(Color.parseColor("#ffffff")), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new BackgroundColorSpan(Color.parseColor("#D12324")), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spannableString;
@@ -161,9 +150,6 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
         if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
-            if (mDownloadManager == null) {
-                initDownload();
-            }
             mDownloadManager.setListener(new DownloadManager.OnDownloadListener() {
                 @Override
                 public void onLoading(int progress) {
@@ -180,7 +166,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
                 @Override
                 public void onStart(long total) {
-                    SPHelper.getInstance().setApkSize(mLatestBean.pkg_url,total);
+                    SPHelper.getInstance().setApkSize(mLatestBean.pkg_url, total);
                 }
             }).download(mLatestBean.pkg_url);
         }
@@ -188,22 +174,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
     protected void downloadApk() {
         dismissAllowingStateLoss();
-        if (mDownloadManager == null) {
-            initDownload();
-        }
         new NotifyDownloadManager(getActivity(), mDownloadManager, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
-    }
-
-    private void initDownload() {
-
-        File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
-        mDownloadManager = DownloadManager.get()
-                .setDir(folder.getPath())
-                .setFileName(getString(R.string.app_name) + ".apk");
     }
 
 

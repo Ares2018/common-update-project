@@ -51,7 +51,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadM
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
             mProgressBar.show();
-            DownloadManager.get().setListener(this).download(mLatestBean.pkg_url);
+           new DownloadManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
         }
     }
 
