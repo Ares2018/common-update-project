@@ -2,6 +2,7 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
         maven {
             url 'https://maven.google.com/'
@@ -20,6 +21,7 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url "http://10.100.62.98:8086/nexus/content/groups/public" }
         maven { url 'http://pre.haier.com/nexus/content/repositories/qdmobile-release/' }

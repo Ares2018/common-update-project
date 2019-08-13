@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
@@ -131,7 +130,7 @@ public class LoadingIndicatorDialog extends Dialog {
         super.onCreate(savedInstanceState);
 
         View contentView = View.inflate(getContext(),
-                R.layout.module_core_loading_alert_dialog, null);
+                R.layout.module_update_loading_alert_dialog, null);
 
         mIvIcon = contentView.findViewById(R.id.iv_icon);
         mTvToast = contentView.findViewById(R.id.tv_toast);
