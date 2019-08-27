@@ -23,7 +23,7 @@ import okhttp3.Response;
  * 文件下载工具类
  * Created by wangzhen on 2017/6/26.
  */
-public class DownloadManager {
+public class APKDownloadManager {
     private final OkHttpClient okHttpClient;
     private final Handler mainThreadHandler;
     private OnDownloadListener mListener;
@@ -32,7 +32,7 @@ public class DownloadManager {
     private Context mContext;
 
 
-    public DownloadManager(Context context) {
+    public APKDownloadManager(Context context) {
         mContext = context;
         okHttpClient = OkHttpUtils.getClient();
         mainThreadHandler = new Handler();
@@ -45,7 +45,7 @@ public class DownloadManager {
         fileName = mContext.getString(R.string.app_name) + ".apk";
     }
 
-    public DownloadManager setListener(OnDownloadListener listener) {
+    public APKDownloadManager setListener(OnDownloadListener listener) {
         this.mListener = listener;
         return this;
     }

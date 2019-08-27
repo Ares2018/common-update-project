@@ -1,4 +1,4 @@
-package cn.daily.news.update.util;
+package cn.daily.news.update.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -10,7 +10,7 @@ import android.net.NetworkInfo;
  * @author a_liYa
  * @date 2017/5/2 19:14.
  */
-public class NetUtils {
+public class NetworkHelper {
 
     /**
      * 网络是否可用

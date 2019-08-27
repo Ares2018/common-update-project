@@ -3,18 +3,18 @@ package cn.daily.news.update.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class SPHelper {
+public class SPManager {
     private static final String PREFERENCE_NAME = "update";
-    private static final SPHelper ourInstance = new SPHelper();
+    private static final SPManager ourInstance = new SPManager();
     private SharedPreferences mPreferences;
 
-    public static SPHelper getInstance() {
+    public static SPManager getInstance() {
         return ourInstance;
     }
 
     private Context mContext;
 
-    private SPHelper() {
+    private SPManager() {
     }
 
     public void init(Context context) {

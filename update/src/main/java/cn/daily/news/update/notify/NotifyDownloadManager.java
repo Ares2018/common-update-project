@@ -7,13 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import com.aliya.uimode.utils.UiModeUtils;
-
-import cn.daily.news.update.util.DownloadManager;
+import cn.daily.news.update.util.APKDownloadManager;
 
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.R;
-import cn.daily.news.update.util.SPHelper;
+import cn.daily.news.update.util.SPManager;
 
 /**
  * Created by lixinke on 2017/12/28.
@@ -25,12 +23,12 @@ public class NotifyDownloadManager {
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
     private long mUpdateTime;
-    private DownloadManager mDownloadManager;
+    private APKDownloadManager mDownloadManager;
     private String mLastVersion;
     private String mApkUrl;
     private Context mContext;
 
-    public NotifyDownloadManager(Context context, DownloadManager downloadManager, String version, String apkUrl) {
+    public NotifyDownloadManager(Context context, APKDownloadManager downloadManager, String version, String apkUrl) {
         mDownloadManager = downloadManager;
         mLastVersion = version;
         mApkUrl = apkUrl;
@@ -59,7 +57,7 @@ public class NotifyDownloadManager {
         mDownloadManager.setListener(new MyOnDownloadListener(mContext)).download(mApkUrl);
     }
 
-    private class MyOnDownloadListener implements DownloadManager.OnDownloadListener {
+    private class MyOnDownloadListener implements APKDownloadManager.OnDownloadListener {
         private Context mContext;
 
         public MyOnDownloadListener(Context context) {
@@ -68,7 +66,7 @@ public class NotifyDownloadManager {
 
         @Override
         public void onStart(long total) {
-            SPHelper.getInstance().setApkSize(mApkUrl,total);
+            SPManager.getInstance().setApkSize(mApkUrl,total);
         }
 
         @Override
@@ -97,7 +95,7 @@ public class NotifyDownloadManager {
             mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
 
             mContext.sendBroadcast(data);
-            SPHelper.getInstance().setApkPath(mApkUrl, path);
+            SPManager.getInstance().setApkPath(mApkUrl, path);
 
         }
 

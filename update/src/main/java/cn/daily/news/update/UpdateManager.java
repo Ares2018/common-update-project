@@ -21,8 +21,7 @@ import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.ui.ForceUpdateDialog;
 import cn.daily.news.update.ui.PreloadUpdateDialog;
 import cn.daily.news.update.ui.UpdateDialogFragment;
-import cn.daily.news.update.util.DownloadManager;
-import cn.daily.news.update.util.SPHelper;
+import cn.daily.news.update.util.SPManager;
 import cn.daily.news.update.util.VersionCompareUtils;
 
 /**
@@ -49,7 +48,7 @@ public class UpdateManager {
     }
 
     public static void init(Context context) {
-        SPHelper.getInstance().init(context);
+        SPManager.getInstance().init(context);
     }
 
     public static void checkUpdate(AppCompatActivity appCompatActivity, VersionBean latest_version) {
@@ -85,7 +84,7 @@ public class UpdateManager {
                 updateDialogFragment = new ForceUpdateDialog();
             } else {
                 if (isHasPreloadApk(latest.pkg_url)) {
-                    latest.preloadPath = SPHelper.getInstance().getApkPath(latest.pkg_url);
+                    latest.preloadPath = SPManager.getInstance().getApkPath(latest.pkg_url);
                     updateDialogFragment = new PreloadUpdateDialog();
                 } else {
                     updateDialogFragment = new UpdateDialogFragment();
@@ -103,10 +102,10 @@ public class UpdateManager {
 
     public static boolean isHasPreloadApk(String pkg_url) {
         try {
-            String path = SPHelper.getInstance().getApkPath(pkg_url);
+            String path = SPManager.getInstance().getApkPath(pkg_url);
             if (!TextUtils.isEmpty(path)) {
                 File file = new File(path);
-                long total = SPHelper.getInstance().getApkSize(pkg_url);
+                long total = SPManager.getInstance().getApkSize(pkg_url);
                 if (file.exists() && file.length() > 0 && file.length() == total) {
                     return true;
                 }
@@ -119,7 +118,7 @@ public class UpdateManager {
     }
 
     public static String getPreloadApkPah(String pkg_url) {
-        return SPHelper.getInstance().getApkPath(pkg_url);
+        return SPManager.getInstance().getApkPath(pkg_url);
     }
 
 

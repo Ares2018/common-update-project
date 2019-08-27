@@ -1,14 +1,11 @@
 package cn.daily.news.update.ui;
 
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -31,9 +28,9 @@ import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
 import cn.daily.news.update.model.VersionBean;
 import cn.daily.news.update.notify.NotifyDownloadManager;
-import cn.daily.news.update.util.DownloadManager;
-import cn.daily.news.update.util.NetUtils;
-import cn.daily.news.update.util.SPHelper;
+import cn.daily.news.update.util.APKDownloadManager;
+import cn.daily.news.update.network.NetworkHelper;
+import cn.daily.news.update.util.SPManager;
 
 
 /**
@@ -46,7 +43,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     protected TextView mOkView;
 
     protected VersionBean mLatestBean;
-    private DownloadManager mDownloadManager;
+    private APKDownloadManager mDownloadManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,7 +52,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         if (args != null) {
             mLatestBean = (VersionBean) getArguments().getSerializable(Constants.Key.UPDATE_INFO);
         }
-        mDownloadManager = new DownloadManager(getContext());
+        mDownloadManager = new APKDownloadManager(getContext());
     }
 
     @Override
@@ -72,7 +69,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
         int layoutId = UpdateManager.getLayoutId();
         if (layoutId == 0) {
-            layoutId = R.layout.fragment_update_dialog;
+            layoutId = R.layout.module_update_fragment_update_dialog;
         }
         View rootView = inflater.inflate(layoutId, container, false);
         return rootView;
@@ -131,7 +128,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     public void updateApk(View view) {
-        if (NetUtils.isWifi(getActivity())) {
+        if (NetworkHelper.isWifi(getActivity())) {
             downloadApk();
         } else {
             dismissAllowingStateLoss();
@@ -149,7 +146,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetUtils.isWifi(getActivity())) {
+        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetworkHelper.isWifi(getActivity())) {
             mDownloadManager.setListener(new CancelDownloadListener()).download(mLatestBean.pkg_url);
         }
     }
@@ -161,7 +158,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
 
     protected void installPreloadApk() {
-        UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
+        UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
     }
 
     @Override
@@ -169,14 +166,14 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         super.onDestroyView();
     }
 
-    private class CancelDownloadListener implements DownloadManager.OnDownloadListener {
+    private class CancelDownloadListener implements APKDownloadManager.OnDownloadListener {
         @Override
         public void onLoading(int progress) {
         }
 
         @Override
         public void onSuccess(String path) {
-            SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
+            SPManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
         }
 
         @Override
@@ -185,7 +182,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
         @Override
         public void onStart(long total) {
-            SPHelper.getInstance().setApkSize(mLatestBean.pkg_url, total);
+            SPManager.getInstance().setApkSize(mLatestBean.pkg_url, total);
         }
     }
 }

@@ -8,14 +8,14 @@ import android.view.View;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
-import cn.daily.news.update.util.DownloadManager;
-import cn.daily.news.update.util.SPHelper;
+import cn.daily.news.update.util.APKDownloadManager;
+import cn.daily.news.update.util.SPManager;
 
 /**
  * Created by lixinke on 2017/10/19.
  */
 
-public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadManager.OnDownloadListener {
+public class ForceUpdateDialog extends UpdateDialogFragment implements APKDownloadManager.OnDownloadListener {
     private LoadingIndicatorDialog mProgressBar;
     private View mDividerView;
 
@@ -47,17 +47,17 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadM
 
     protected void forceDownloadApk() {
         if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
-            UpdateManager.installApk(getContext(), SPHelper.getInstance().getApkPath(mLatestBean.pkg_url));
+            UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
             mProgressBar.show();
-           new DownloadManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
+           new APKDownloadManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
         }
     }
 
     @Override
     public void onStart(long total) {
-        SPHelper.getInstance().setApkSize(mLatestBean.pkg_url,total);
+        SPManager.getInstance().setApkSize(mLatestBean.pkg_url,total);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadM
     @Override
     public void onSuccess(String path) {
         UpdateManager.installApk(getContext(), path);
-        SPHelper.getInstance().setApkPath(mLatestBean.pkg_url, path);
+        SPManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
         mProgressBar.dismiss();
         mOkView.setEnabled(true);
     }
