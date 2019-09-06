@@ -101,7 +101,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         SpannableString spannableString = new SpannableString(title + version);
         spannableString.setSpan(new AbsoluteSizeSpan(12, true), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new ForegroundColorSpan(Color.parseColor("#ffffff")), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableString.setSpan(new BackgroundColorSpan(Color.parseColor("#D12324")), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.update_top_title_tip_color)), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spannableString;
     }
 
