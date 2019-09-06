@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import cn.daily.news.update.util.APKDownloadManager;
+import cn.daily.news.update.util.DownloadAPKManager;
 
 import cn.daily.news.update.Constants;
 import cn.daily.news.update.UpdateManager;
@@ -26,7 +26,7 @@ public class UpdateReceiver extends BroadcastReceiver {
         } else if (Constants.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
             String url = intent.getStringExtra(Constants.Key.APK_URL);
             String version = intent.getStringExtra(Constants.Key.APK_VERSION);
-            new NotifyDownloadManager(context, new APKDownloadManager(context), version, url).startDownloadApk();
+            new NotifyDownloadManager(context, new DownloadAPKManager(context), version, url).startDownloadApk();
         }
     }
 }

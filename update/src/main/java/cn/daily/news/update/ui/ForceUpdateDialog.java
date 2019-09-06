@@ -8,14 +8,14 @@ import android.view.View;
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
-import cn.daily.news.update.util.APKDownloadManager;
+import cn.daily.news.update.util.DownloadAPKManager;
 import cn.daily.news.update.util.SPManager;
 
 /**
  * Created by lixinke on 2017/10/19.
  */
 
-public class ForceUpdateDialog extends UpdateDialogFragment implements APKDownloadManager.OnDownloadListener {
+public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadAPKManager.OnDownloadListener {
     private LoadingIndicatorDialog mProgressBar;
     private View mDividerView;
 
@@ -51,7 +51,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements APKDownlo
         } else {
             mProgressBar = new LoadingIndicatorDialog(getActivity());
             mProgressBar.show();
-           new APKDownloadManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
+           new DownloadAPKManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
         }
     }
 
