@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
@@ -16,7 +17,7 @@ import cn.daily.news.update.util.SPManager;
  */
 
 public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadAPKManager.OnDownloadListener {
-    private LoadingIndicatorDialog mProgressBar;
+    private ProgressBar mProgressBar;
     private View mDividerView;
 
     @Override
@@ -24,6 +25,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
         super.onViewCreated(view, savedInstanceState);
         mCancelView.setVisibility(View.GONE);
         mDividerView = view.findViewById(R.id.update_btn_divider);
+        mProgressBar=view.findViewById(R.id.update_dialog_progressBar);
         if (mDividerView != null) {
             mDividerView.setVisibility(View.GONE);
         }
@@ -49,8 +51,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
         if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
             UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
         } else {
-            mProgressBar = new LoadingIndicatorDialog(getActivity());
-            mProgressBar.show();
+           mProgressBar.setVisibility(View.VISIBLE);
            new DownloadAPKManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
         }
     }
@@ -58,23 +59,28 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
     @Override
     public void onStart(long total) {
         SPManager.getInstance().setApkSize(mLatestBean.pkg_url,total);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mProgressBar.setMax(100);
+        mProgressBar.setProgress(0);
     }
 
     @Override
     public void onLoading(int progress) {
+        mProgressBar.setProgress(progress);
     }
 
     @Override
     public void onSuccess(String path) {
+        mProgressBar.setProgress(100);
         UpdateManager.installApk(getContext(), path);
         SPManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
-        mProgressBar.dismiss();
+        mProgressBar.setVisibility(View.GONE);
         mOkView.setEnabled(true);
     }
 
     @Override
     public void onFail(String err) {
-        mProgressBar.dismiss();
+        mProgressBar.setVisibility(View.GONE);
         mMsgView.setText(getString(R.string.text_tip_fail));
         mMsgView.setVisibility(View.VISIBLE);
     }
