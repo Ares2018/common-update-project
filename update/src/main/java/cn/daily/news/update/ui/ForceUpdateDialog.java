@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
@@ -17,7 +16,7 @@ import cn.daily.news.update.util.SPManager;
  */
 
 public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadAPKManager.OnDownloadListener {
-    private ProgressBar mProgressBar;
+    private UpdateProgressBar mProgressBar;
     private View mDividerView;
 
     @Override
@@ -51,7 +50,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
         if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
             UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
         } else {
-           mProgressBar.setVisibility(View.VISIBLE);
+            mMsgView.setVisibility(View.INVISIBLE);
            new DownloadAPKManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
         }
     }
