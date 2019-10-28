@@ -75,6 +75,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
         SPManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
         mProgressBar.setVisibility(View.GONE);
         mOkView.setEnabled(true);
+        mMsgView.setVisibility(View.VISIBLE);
     }
 
     @Override

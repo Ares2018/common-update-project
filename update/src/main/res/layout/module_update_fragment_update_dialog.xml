@@ -42,6 +42,8 @@
                 tools:text="@string/text_default_title" />
 
             <FrameLayout
+                android:minHeight="150dp"
+                android:minWidth="150dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/update_title"
@@ -52,8 +54,8 @@
                 <cn.daily.news.update.ui.UpdateProgressBar
                     android:id="@+id/update_dialog_progressBar"
                     style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_gravity="center"
                     android:layout_margin="10dp"
                     android:padding="15dp"
