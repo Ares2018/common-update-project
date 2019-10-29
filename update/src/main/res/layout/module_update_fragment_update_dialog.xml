@@ -42,13 +42,13 @@
                 tools:text="@string/text_default_title" />
 
             <FrameLayout
-                android:minHeight="150dp"
-                android:minWidth="150dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/update_title"
                 android:layout_centerVertical="true"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:minWidth="150dp"
+                android:minHeight="150dp">
 
 
                 <cn.daily.news.update.ui.UpdateProgressBar
@@ -63,11 +63,11 @@
                     app:bga_pb_isCapRounded="true"
                     app:bga_pb_mode="circle"
                     app:bga_pb_radius="24dp"
-                    app:bga_pb_reachedColor="#FF530D"
+                    app:bga_pb_reachedColor="@color/update_reached_color"
                     app:bga_pb_reachedHeight="4dp"
-                    app:bga_pb_textColor="#FF530D"
+                    app:bga_pb_textColor="@color/update_percent_text_color"
                     app:bga_pb_textSize="14sp"
-                    app:bga_pb_unReachedColor="#ECF0F1"
+                    app:bga_pb_unReachedColor="@color/update_un_reached_color"
                     app:bga_pb_unReachedHeight="2dp" />
 
 
@@ -124,6 +124,18 @@
                     android:textColor="@color/_ffffff"
                     android:textSize="14sp" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/update_download_tip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:text="@string/force_update_tip"
+                android:textColor="#ff222222"
+                android:textSize="16sp"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
