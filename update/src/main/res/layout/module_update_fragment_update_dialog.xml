@@ -135,7 +135,7 @@
             android:layout_marginBottom="-10dp"
             android:layout_alignParentRight="true"
             android:layout_above="@+id/update_container"
-            android:background="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="@drawable/update_cancel_background"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </RelativeLayout>
