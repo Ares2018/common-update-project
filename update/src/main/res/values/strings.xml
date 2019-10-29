@@ -15,7 +15,7 @@
     <string name="error_invalid_apk_url">无效的URL</string>
     <string name="error_invalid_apk_file">不是有效的安装包</string>
     <string name="text_install">安装</string>
-    <string name="text_update">更新</string>
+    <string name="update_ok">更新</string>
     <string name="text_tip_fail">更新失败,请稍后再试</string>
     <string name="text_default_remark">有新版本请更新!</string>
     <string name="text_default_title">检测到新版本</string>

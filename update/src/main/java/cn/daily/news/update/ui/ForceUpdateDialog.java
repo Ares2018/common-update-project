@@ -46,7 +46,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
 
     @Override
     protected String getOKText() {
-        return getString(R.string.text_update);
+        return getString(R.string.update_ok);
     }
 
     protected void forceDownloadApk() {

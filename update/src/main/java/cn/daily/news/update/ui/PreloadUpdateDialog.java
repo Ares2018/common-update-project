@@ -13,7 +13,7 @@ import cn.daily.news.update.UpdateType;
 public class PreloadUpdateDialog extends UpdateDialogFragment {
     @Override
     protected String getOKText() {
-        return getString(R.string.text_update);
+        return getString(R.string.update_ok);
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.ProgressBar;
@@ -90,31 +91,31 @@ public class UpdateProgressBar extends ProgressBar {
     }
 
     protected void initAttr(int attr, TypedArray typedArray) {
-        if (attr == R.styleable.UpdateProgressBar_bga_pb_mode) {
+        if (attr == R.styleable.UpdateProgressBar_mode) {
             int ordinal = typedArray.getInt(attr, Mode.System.ordinal());
             mMode = Mode.values()[ordinal];
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_textColor) {
+        } else if (attr == R.styleable.UpdateProgressBar_textColor) {
             mTextColor = typedArray.getColor(attr, mTextColor);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_textSize) {
+        } else if (attr == R.styleable.UpdateProgressBar_textSize) {
             mTextSize = typedArray.getDimensionPixelOffset(attr, mTextSize);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_textMargin) {
+        } else if (attr == R.styleable.UpdateProgressBar_textMargin) {
             mTextMargin = typedArray.getDimensionPixelOffset(attr, mTextMargin);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_reachedColor) {
+        } else if (attr == R.styleable.UpdateProgressBar_reachedColor) {
             mReachedColor = typedArray.getColor(attr, mReachedColor);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_reachedHeight) {
+        } else if (attr == R.styleable.UpdateProgressBar_reachedHeight) {
             mReachedHeight = typedArray.getDimensionPixelOffset(attr, mReachedHeight);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_unReachedColor) {
+        } else if (attr == R.styleable.UpdateProgressBar_unReachedColor) {
             mUnReachedColor = typedArray.getColor(attr, mUnReachedColor);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_unReachedHeight) {
+        } else if (attr == R.styleable.UpdateProgressBar_unReachedHeight) {
             mUnReachedHeight = typedArray.getDimensionPixelOffset(attr, mUnReachedHeight);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_isCapRounded) {
+        } else if (attr == R.styleable.UpdateProgressBar_isCapRounded) {
             mIsCapRounded = typedArray.getBoolean(attr, mIsCapRounded);
             if (mIsCapRounded) {
                 mPaint.setStrokeCap(Paint.Cap.ROUND);
             }
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_isHiddenText) {
+        } else if (attr == R.styleable.UpdateProgressBar_isHiddenText) {
             mIsHiddenText = typedArray.getBoolean(attr, mIsHiddenText);
-        } else if (attr == R.styleable.UpdateProgressBar_bga_pb_radius) {
+        } else if (attr == R.styleable.UpdateProgressBar_radius) {
             mRadius = typedArray.getDimensionPixelOffset(attr, mRadius);
         }
     }
@@ -221,6 +222,7 @@ public class UpdateProgressBar extends ProgressBar {
 
             mPaint.setTextAlign(Paint.Align.LEFT);
             mPaint.setStyle(Paint.Style.FILL);
+            mPaint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             mPaint.setColor(mTextColor);
             float textStartX = reachedEndX > 0 ? reachedEndX + mTextMargin : reachedEndX;
             canvas.drawText(mText, textStartX, mTextHeight / 2, mPaint);

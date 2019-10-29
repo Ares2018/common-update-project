@@ -9,19 +9,23 @@
     android:paddingTop="76dp"
     android:paddingBottom="130dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="262dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:minHeight="200dp"
         android:orientation="vertical">
 
+
         <ImageView
+            android:id="@+id/update_top"
             android:layout_width="262dp"
             android:layout_height="wrap_content"
             android:src="@drawable/update_top_background" />
 
         <LinearLayout
+            android:id="@+id/update_container"
+            android:layout_below="@+id/update_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/update_content_background"
@@ -60,15 +64,15 @@
                     android:layout_margin="10dp"
                     android:padding="15dp"
                     android:visibility="gone"
-                    app:bga_pb_isCapRounded="true"
-                    app:bga_pb_mode="circle"
-                    app:bga_pb_radius="24dp"
-                    app:bga_pb_reachedColor="@color/update_reached_color"
-                    app:bga_pb_reachedHeight="4dp"
-                    app:bga_pb_textColor="@color/update_percent_text_color"
-                    app:bga_pb_textSize="14sp"
-                    app:bga_pb_unReachedColor="@color/update_un_reached_color"
-                    app:bga_pb_unReachedHeight="2dp" />
+                    app:isCapRounded="true"
+                    app:mode="circle"
+                    app:radius="@dimen/update_radius"
+                    app:reachedColor="@color/update_reached_color"
+                    app:reachedHeight="@dimen/update_reachedHeight"
+                    app:textColor="@color/update_percent_text_color"
+                    app:textSize="@dimen/update_percent_text_size"
+                    app:unReachedColor="@color/update_un_reached_color"
+                    app:unReachedHeight="@dimen/update_unReachedHeight" />
 
 
                 <TextView
@@ -93,20 +97,8 @@
                 android:layout_centerHorizontal="true"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/update_cancel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/btn_cancel_background"
-                    android:gravity="center"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:text="@string/update_cancel_text"
-                    android:textColor="@color/_484848_7a7b7d"
-                    android:textSize="14sp" />
-
                 <View
+                    android:visibility="gone"
                     android:id="@+id/update_btn_divider"
                     android:layout_width="20dp"
                     android:layout_height="1dp" />
@@ -120,7 +112,7 @@
                     android:gravity="center"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    android:text="确定"
+                    android:text="@string/update_ok"
                     android:textColor="@color/_ffffff"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -137,5 +129,14 @@
                 android:textSize="16sp"
                 android:visibility="gone" />
         </LinearLayout>
-    </LinearLayout>
+        <TextView
+            android:id="@id/update_cancel"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="-10dp"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/update_container"
+            android:background="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 </LinearLayout>

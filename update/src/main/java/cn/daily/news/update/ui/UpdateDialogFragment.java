@@ -110,7 +110,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected String getOKText() {
-        return getString(R.string.text_update);
+        return getString(R.string.update_ok);
     }
 
 
