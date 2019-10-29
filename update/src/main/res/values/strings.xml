@@ -21,7 +21,7 @@
     <string name="text_default_title">检测到新版本</string>
     <string name="text_non_wifi_remark">您正在使用非Wi-Fi网络，更新版本可能产生超额流量费用</string>
     <string name="text_non_wifi_update">继续更新</string>
-    <string name="text_title_preload">已在WIFI下为您预下载了最新版本%s(版本号),是否立即更新?</string>
+    <string name="text_title_preload">已在WiFi下为您预下载了最新版本</string>
     <string name="update_cancel_text">下次再说</string>
     <string name="force_update_tip">安装包下载中，请不要退出</string>
     <string name="update_install">立即安装</string>
