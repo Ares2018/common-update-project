@@ -96,7 +96,7 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected SpannableString getTitle() {
-        String title = getString(R.string.text_default_title) + "\t";
+        String title = getString(R.string.text_default_title) + "\n";
         String version = " " + mLatestBean.version + " ";
         SpannableString spannableString = new SpannableString(title + version);
         spannableString.setSpan(new AbsoluteSizeSpan(12, true), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

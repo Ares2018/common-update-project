@@ -20,6 +20,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
     private UpdateProgressBar mProgressBar;
     private View mDividerView;
     private TextView mDownloadTipView;
+    private View mDownloadFinishView;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
         mDividerView = view.findViewById(R.id.update_btn_divider);
         mProgressBar=view.findViewById(R.id.update_dialog_progressBar);
         mDownloadTipView = view.findViewById(R.id.update_download_tip);
+        mDownloadFinishView=view.findViewById(R.id.update_download_finish);
         if (mDividerView != null) {
             mDividerView.setVisibility(View.GONE);
         }
@@ -57,6 +59,7 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
             mDownloadTipView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.VISIBLE);
             mOkView.setVisibility(View.GONE);
+            mDownloadFinishView.setVisibility(View.GONE);
            new DownloadAPKManager(getContext()).setListener(this).download(mLatestBean.pkg_url);
         }
     }
@@ -77,10 +80,10 @@ public class ForceUpdateDialog extends UpdateDialogFragment implements DownloadA
     public void onSuccess(String path) {
         mProgressBar.setProgress(100);
         mProgressBar.setVisibility(View.GONE);
-        mMsgView.setVisibility(View.VISIBLE);
         mOkView.setVisibility(View.VISIBLE);
         mOkView.setText(getString(R.string.update_install));
         mDownloadTipView.setVisibility(View.GONE);
+        mDownloadFinishView.setVisibility(View.VISIBLE);
 
         UpdateManager.installApk(getContext(), path);
         SPManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
