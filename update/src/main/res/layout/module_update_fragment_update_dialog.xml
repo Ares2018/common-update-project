@@ -3,16 +3,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="262dp"
-    android:layout_height="346dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:gravity="center">
 
     <RelativeLayout
         android:layout_width="262dp"
-        android:layout_height="wrap_content"
+        android:layout_height="346dp"
         android:background="@drawable/update_content_background"
         android:gravity="center"
-        android:minHeight="200dp"
         android:orientation="vertical">
 
 
@@ -28,7 +27,7 @@
         <LinearLayout
             android:id="@+id/update_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@+id/update_top"
             android:orientation="vertical"
             android:paddingLeft="21dp"
@@ -42,12 +41,12 @@
                 android:fontFamily="@font/fzzcysk_zbjt"
                 android:gravity="center"
                 android:textColor="#ff222222"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 tools:text="@string/text_default_title" />
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@id/update_title"
                 android:layout_centerVertical="true"
                 android:layout_weight="1"
@@ -75,12 +74,12 @@
                     app:unReachedHeight="@dimen/update_unReachedHeight" />
 
                 <ImageView
-                    android:visibility="gone"
                     android:id="@+id/update_download_finish"
                     android:layout_width="89dp"
                     android:layout_height="86dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/update_download_finish" />
+                    android:src="@drawable/update_download_finish"
+                    android:visibility="gone" />
 
 
                 <TextView
@@ -89,8 +88,8 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:scrollbars="vertical"
-                    android:textColor="#ff666666"
-                    android:textSize="12sp"
+                    android:textColor="@color/_222222"
+                    android:textSize="14sp"
                     android:visibility="visible"
                     tools:text="v5.0.0版本全新亮相\n" />
             </FrameLayout>

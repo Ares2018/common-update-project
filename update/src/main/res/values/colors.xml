@@ -10,5 +10,6 @@
     <color name="update_un_reached_color">#ECF0F1</color>
     <color name="update_percent_text_color">#FF530D</color>
     <color name="update_reached_color">#FF530D</color>
+    <color name="_222222">#222222</color>
 
 </resources>
