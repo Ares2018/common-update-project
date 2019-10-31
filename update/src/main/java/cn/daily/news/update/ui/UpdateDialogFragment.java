@@ -153,7 +153,9 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        mNotifyDownloadManager.removeDownloadListener();
+        if (mNotifyDownloadManager != null) {
+            mNotifyDownloadManager.removeDownloadListener();
+        }
     }
 
     protected void downloadApk() {

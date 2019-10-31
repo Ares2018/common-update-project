@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -93,7 +94,9 @@ public class UpdateManager {
             Bundle args = new Bundle();
             args.putSerializable(Constants.Key.UPDATE_INFO, latest);
             updateDialogFragment.setArguments(args);
-            updateDialogFragment.show(activity.getSupportFragmentManager(), "updateDialog");
+            FragmentTransaction transaction=activity.getSupportFragmentManager().beginTransaction();
+            transaction.add(updateDialogFragment,"updateDialog");
+            transaction.commitAllowingStateLoss();
         } else if (!TextUtils.isEmpty(tip)) {
             Toast.makeText(activity, tip, Toast.LENGTH_SHORT).show();
         }
@@ -101,21 +104,20 @@ public class UpdateManager {
 
 
     public static boolean isHasPreloadApk(String pkg_url) {
-//        try {
-//            String path = SPManager.getInstance().getApkPath(pkg_url);
-//            if (!TextUtils.isEmpty(path)) {
-//                File file = new File(path);
-//                long total = SPManager.getInstance().getApkSize(pkg_url);
-//                if (file.exists() && file.length() > 0 && file.length() == total) {
-//                    return true;
-//                }
-//                return false;
-//            }
-//            return false;
-//        } catch (Exception e) {
-//            return false;
-//        }
-        return false;
+        try {
+            String path = SPManager.getInstance().getApkPath(pkg_url);
+            if (!TextUtils.isEmpty(path)) {
+                File file = new File(path);
+                long total = SPManager.getInstance().getApkSize(pkg_url);
+                if (file.exists() && file.length() > 0 && file.length() == total) {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static String getPreloadApkPah(String pkg_url) {
