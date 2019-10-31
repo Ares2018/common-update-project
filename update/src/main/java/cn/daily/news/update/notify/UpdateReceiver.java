@@ -26,7 +26,7 @@ public class UpdateReceiver extends BroadcastReceiver {
         } else if (Constants.Action.DOWNLOAD_RETRY.equals(intent.getAction())) {
             String url = intent.getStringExtra(Constants.Key.APK_URL);
             String version = intent.getStringExtra(Constants.Key.APK_VERSION);
-            new NotifyDownloadManager(context, new DownloadAPKManager(context), version, url).startDownloadApk();
+            new NotifyDownloadManager(context, new DownloadAPKManager(context), null,version, url).startDownloadApk();
         }
     }
 }

@@ -27,8 +27,10 @@ public class NotifyDownloadManager {
     private String mLastVersion;
     private String mApkUrl;
     private Context mContext;
+    private DownloadAPKManager.OnDownloadListener mOnDownloadListener;
+    private MyOnDownloadListener mMyOnDownloadListener;
 
-    public NotifyDownloadManager(Context context, DownloadAPKManager downloadManager, String version, String apkUrl) {
+    public NotifyDownloadManager(Context context, DownloadAPKManager downloadManager, DownloadAPKManager.OnDownloadListener listener, String version, String apkUrl) {
         mDownloadManager = downloadManager;
         mLastVersion = version;
         mApkUrl = apkUrl;
@@ -44,6 +46,7 @@ public class NotifyDownloadManager {
         }
         mBuilder = new NotificationCompat.Builder(mContext, "1");
         mBuilder.setSmallIcon(android.R.drawable.stat_sys_download);
+        mOnDownloadListener =listener;
     }
 
     public void startDownloadApk() {
@@ -54,19 +57,34 @@ public class NotifyDownloadManager {
 
         mUpdateTime = System.currentTimeMillis();
 
-        mDownloadManager.setListener(new MyOnDownloadListener(mContext)).download(mApkUrl);
+        mMyOnDownloadListener=new MyOnDownloadListener(mContext, mOnDownloadListener);
+        mDownloadManager.setListener(mMyOnDownloadListener).download(mApkUrl);
+    }
+
+    public void removeDownloadListener() {
+        mOnDownloadListener =null;
+        mMyOnDownloadListener.removeDownloadListener();
     }
 
     private class MyOnDownloadListener implements DownloadAPKManager.OnDownloadListener {
         private Context mContext;
+        private DownloadAPKManager.OnDownloadListener mMyOnDownloadListener;
 
-        public MyOnDownloadListener(Context context) {
+        public void removeDownloadListener() {
+            mMyOnDownloadListener=null;
+        }
+
+        public MyOnDownloadListener(Context context, DownloadAPKManager.OnDownloadListener myOnDownloadListener) {
             mContext = context;
+            mMyOnDownloadListener=myOnDownloadListener;
         }
 
         @Override
         public void onStart(long total) {
             SPManager.getInstance().setApkSize(mApkUrl,total);
+            if(mMyOnDownloadListener!=null){
+                mMyOnDownloadListener.onStart(total);
+            }
         }
 
         @Override
@@ -78,6 +96,9 @@ public class NotifyDownloadManager {
             mBuilder.setAutoCancel(false);
             mBuilder.setProgress(100, progress, false);
             mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
+            if(mMyOnDownloadListener!=null){
+                mMyOnDownloadListener.onLoading(progress);
+            }
         }
 
         @Override
@@ -97,6 +118,10 @@ public class NotifyDownloadManager {
             mContext.sendBroadcast(data);
             SPManager.getInstance().setApkPath(mApkUrl, path);
 
+            if(mMyOnDownloadListener!=null){
+                mMyOnDownloadListener.onSuccess(path);
+            }
+
         }
 
         @Override
@@ -113,6 +138,10 @@ public class NotifyDownloadManager {
             mBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
             mBuilder.setAutoCancel(true);
             mNotificationManager.notify(NOTIFY_PROGRESS_ID, mBuilder.build());
+
+            if(mMyOnDownloadListener!=null){
+                mMyOnDownloadListener.onFail(err);
+            }
         }
     }
 }

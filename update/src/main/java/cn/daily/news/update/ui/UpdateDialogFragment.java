@@ -27,23 +27,27 @@ import cn.daily.news.update.R;
 import cn.daily.news.update.UpdateManager;
 import cn.daily.news.update.UpdateType;
 import cn.daily.news.update.model.VersionBean;
+import cn.daily.news.update.network.NetworkHelper;
 import cn.daily.news.update.notify.NotifyDownloadManager;
 import cn.daily.news.update.util.DownloadAPKManager;
-import cn.daily.news.update.network.NetworkHelper;
 import cn.daily.news.update.util.SPManager;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UpdateDialogFragment extends DialogFragment implements View.OnClickListener {
+public class UpdateDialogFragment extends DialogFragment implements View.OnClickListener, DownloadAPKManager.OnDownloadListener {
     protected TextView mTitleView;
     protected TextView mMsgView;
     protected View mCancelView;
     protected TextView mOkView;
+    protected TextView mDownloadTipView;
+    protected UpdateProgressBar mProgressBar;
+    protected View mDownloadFinishView;
 
     protected VersionBean mLatestBean;
     private DownloadAPKManager mDownloadManager;
+    private NotifyDownloadManager mNotifyDownloadManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,6 +88,9 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         mOkView.setOnClickListener(this);
         mCancelView = view.findViewById(R.id.update_cancel);
         mCancelView.setOnClickListener(this);
+        mProgressBar = view.findViewById(R.id.update_dialog_progressBar);
+        mDownloadTipView = view.findViewById(R.id.update_download_tip);
+        mDownloadFinishView = view.findViewById(R.id.update_download_finish);
         if (mLatestBean != null) {
             if (!TextUtils.isEmpty(getRemark())) {
                 mMsgView.setText(Html.fromHtml(getRemark()));
@@ -146,14 +153,13 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
     public void cancelUpdate(View view) {
         dismissAllowingStateLoss();
-        if (!UpdateManager.isHasPreloadApk(mLatestBean.pkg_url) && NetworkHelper.isWifi(getActivity())) {
-            mDownloadManager.setListener(new CancelDownloadListener()).download(mLatestBean.pkg_url);
-        }
+        mNotifyDownloadManager.removeDownloadListener();
     }
 
     protected void downloadApk() {
-        dismissAllowingStateLoss();
-        new NotifyDownloadManager(getActivity(), mDownloadManager, mLatestBean.version, mLatestBean.pkg_url).startDownloadApk();
+        mNotifyDownloadManager = new NotifyDownloadManager(getActivity(), mDownloadManager, this, mLatestBean.version, mLatestBean.pkg_url);
+        mNotifyDownloadManager.startDownloadApk();
+        updateUI();
     }
 
 
@@ -166,23 +172,48 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
         super.onDestroyView();
     }
 
-    private class CancelDownloadListener implements DownloadAPKManager.OnDownloadListener {
-        @Override
-        public void onLoading(int progress) {
+    protected void updateUI() {
+        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
+            UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
+        } else {
+            mMsgView.setVisibility(View.INVISIBLE);
+            mDownloadTipView.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.VISIBLE);
+            mOkView.setVisibility(View.GONE);
+            mDownloadFinishView.setVisibility(View.GONE);
+            startDownloadApk(mLatestBean.pkg_url);
         }
+    }
 
-        @Override
-        public void onSuccess(String path) {
-            SPManager.getInstance().setApkPath(mLatestBean.pkg_url, path);
-        }
+    protected void startDownloadApk(String pkg_url) {
+    }
 
-        @Override
-        public void onFail(String err) {
-        }
+    @Override
+    public void onStart(long total) {
+        SPManager.getInstance().setApkSize(mLatestBean.pkg_url, total);
+        mProgressBar.setMax(100);
+        mProgressBar.setProgress(0);
+    }
 
-        @Override
-        public void onStart(long total) {
-            SPManager.getInstance().setApkSize(mLatestBean.pkg_url, total);
-        }
+    @Override
+    public void onLoading(int progress) {
+        mProgressBar.setProgress(progress);
+    }
+
+    @Override
+    public void onSuccess(String path) {
+        mProgressBar.setProgress(100);
+        mProgressBar.setVisibility(View.GONE);
+        mOkView.setVisibility(View.VISIBLE);
+        mOkView.setText(getString(R.string.update_install));
+        mDownloadTipView.setVisibility(View.GONE);
+        mDownloadFinishView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onFail(String err) {
+        mProgressBar.setVisibility(View.GONE);
+        mMsgView.setText(getString(R.string.text_tip_fail));
+        mMsgView.setVisibility(View.VISIBLE);
     }
 }
