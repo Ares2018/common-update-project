@@ -27,11 +27,11 @@ public class ForceUpdateDialog extends UpdateDialogFragment  {
         }
 
     }
-
-    @Override
-    public void updateApk(View view) {
-        updateUI();
-    }
+//
+//    @Override
+//    public void updateApk(View view) {
+//        updateUI();
+//    }
 
     @Override
     protected UpdateType getType() {
@@ -43,8 +43,8 @@ public class ForceUpdateDialog extends UpdateDialogFragment  {
         return getString(R.string.update_ok);
     }
 
-    @Override
-    protected void startDownloadApk(String pkg_url) {
-        new DownloadAPKManager(getContext()).setListener(this).download(pkg_url);
-    }
+//    @Override
+//    protected void startDownloadApk(String pkg_url) {
+//        new DownloadAPKManager(getContext()).setListener(this).download(pkg_url);
+//    }
 }

@@ -159,9 +159,14 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected void downloadApk() {
-        mNotifyDownloadManager = new NotifyDownloadManager(getActivity(), mDownloadManager, this, mLatestBean.version, mLatestBean.pkg_url);
-        mNotifyDownloadManager.startDownloadApk();
-        updateUI();
+        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
+            UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
+        } else {
+            mNotifyDownloadManager = new NotifyDownloadManager(getActivity(), mDownloadManager, this, mLatestBean.version, mLatestBean.pkg_url);
+            mNotifyDownloadManager.startDownloadApk();
+            updateUI();
+        }
+
     }
 
 
@@ -175,16 +180,12 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
     }
 
     protected void updateUI() {
-        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
-            UpdateManager.installApk(getContext(), SPManager.getInstance().getApkPath(mLatestBean.pkg_url));
-        } else {
-            mMsgView.setVisibility(View.INVISIBLE);
-            mDownloadTipView.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.VISIBLE);
-            mOkView.setVisibility(View.GONE);
-            mDownloadFinishView.setVisibility(View.GONE);
-            startDownloadApk(mLatestBean.pkg_url);
-        }
+        mMsgView.setVisibility(View.INVISIBLE);
+        mDownloadTipView.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mOkView.setVisibility(View.GONE);
+        mDownloadFinishView.setVisibility(View.GONE);
+        startDownloadApk(mLatestBean.pkg_url);
     }
 
     protected void startDownloadApk(String pkg_url) {
