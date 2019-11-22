@@ -16,6 +16,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,10 @@ public class UpdateDialogFragment extends DialogFragment implements View.OnClick
 
     protected SpannableString getTitle() {
         String title = getString(R.string.text_default_title) + "\n";
+        if (UpdateManager.isHasPreloadApk(mLatestBean.pkg_url)) {
+            title = getString(R.string.text_title_preload) + "\t";
+            mTitleView.setGravity(Gravity.LEFT);
+        }
         String version = " " + mLatestBean.version + " ";
         SpannableString spannableString = new SpannableString(title + version);
         spannableString.setSpan(new AbsoluteSizeSpan(12, true), title.length(), title.length() + version.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
